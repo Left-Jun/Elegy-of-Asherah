@@ -1,0 +1,9 @@
+AnJian：主页按键音效
+8Bit-SE：拿到合成器的音效
+Guitar-SE：拿到吉他的音效
+CTI-SE：拿到笛子的音效
+Cat_Meow：猫叫
+Eat：吃到二段跳食物的音效，也是猫叫
+Hoop：跳起音效
+Drop：落下音效
+StepLoop：走路音效
