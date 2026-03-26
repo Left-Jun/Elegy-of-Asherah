@@ -19,9 +19,9 @@ public class UIManager : MonoBehaviour
             return;
         }
         _instance = this;
-        _instance._pfbButtonA = Resources.Load<GameObject>("UI/Button/ButtonA");
-        if (_instance._pfbButtonA == null)
-            Debug.LogError("ButtonA prefab not found in Resources/UI/Button/");
+        //_instance._pfbButtonA = Resources.Load<GameObject>("UI/Button/ButtonA");
+        //if (_instance._pfbButtonA == null)
+        //    Debug.LogError("ButtonA prefab not found in Resources/UI/Button/");
         HideCursorA();
         DontDestroyOnLoad(gameObject);
     }

@@ -35,6 +35,13 @@ public class Widget : MonoBehaviour
     /// <param name="onFinished">完成回调</param>
     public void Fade(float opacity, float duration, Action onFinished)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            // 如果物体未激活，直接设置透明度并回调
+            _canvasGroup.alpha = opacity;
+            onFinished?.Invoke();
+            return;
+        }
         if (duration <= 0)
         {
             _canvasGroup.alpha = opacity;

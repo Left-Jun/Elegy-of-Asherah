@@ -8,6 +8,7 @@ TagManager:
   - Trap
   - BreakableWall
   - EmotionShard
+  - 1
   layers:
   - Default
   - TransparentFX

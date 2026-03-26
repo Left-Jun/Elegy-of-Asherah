@@ -229,69 +229,74 @@ public class AdvancedText : TextMeshProUGUI
     /// <param name="content">显示内容（可包含TMP标签和自定义标签）</param>
     /// <param name="type">显示类型</param>
     /// <param name="fadingDuration">整体淡入持续时间</param>
-    public IEnumerator SetText(string content, DisplayType type, float fadingDuration = 0.2f)
+public IEnumerator SetText(string content, DisplayType type, float fadingDuration = 0.2f)
+{
+    if (_typingCoroutine != null)
     {
-        if (_typingCoroutine != null)
-        {
-            StopCoroutine(_typingCoroutine);
-        }
-        ClearRubyText();
-        SetText(content);          // 设置文本，会自动调用预处理器
-        yield return null;        // 等待一帧，确保文本更新完成
-
-        switch (type)
-        {
-            case DisplayType.Default:
-                _widget.RenderOpacity = 1;
-                SetAllRubyText();
-                OnFinished?.Invoke();
-                break;
-            case DisplayType.Fading:
-                _widget.Fade(1, fadingDuration, OnFinished.Invoke);
-                SetAllRubyText();
-                break;
-            case DisplayType.Typing:
-                _widget.Fade(1, fadingDuration, null);
-                _typingCoroutine = StartCoroutine(Typing());
-                break;
-            default:
-                break;
-        }
+        StopCoroutine(_typingCoroutine);
     }
+    ClearRubyText();
 
+    switch (type)
+    {
+        case DisplayType.Default:
+            SetText(content);
+            _widget.RenderOpacity = 1;
+            SetAllRubyText();
+            OnFinished?.Invoke();
+            break;
+        case DisplayType.Fading:
+            SetText(content);
+            _widget.Fade(1, fadingDuration, OnFinished.Invoke);
+            SetAllRubyText();
+            break;
+        case DisplayType.Typing:
+            // 先整体淡入（不影响字符透明度）
+            _widget.Fade(1, fadingDuration, null);
+            // 设置完整文本
+            SetText(content);
+            // 强制更新网格，获取字符信息
+            ForceMeshUpdate();
+            // 立即将所有字符设为不可见
+            for (int i = 0; i < m_characterCount; i++)
+            {
+                SetSingleCharacterAlpha(i, 0);
+            }
+            // 启动打字机协程
+            _typingCoroutine = StartCoroutine(Typing());
+            break;
+        default:
+            break;
+    }
+    yield break; // 因为 Typing 是协程，但这里不需要等待，所以直接结束
+}
     /// <summary>
     /// 打字机协程：逐字符淡入显示
     /// </summary>
-    IEnumerator Typing()
+IEnumerator Typing()
+{
+    // ForceMeshUpdate(); // 不需要，已经在SetText中调用
+    // for (int i = 0; i < m_characterCount; i++) // 不需要，已经在SetText中设置
+    // {
+    //     SetSingleCharacterAlpha(i,0);
+    // }
+
+    _typingIndex = 0;
+    while (_typingIndex < m_characterCount)
     {
-        ForceMeshUpdate();
-        // 先将所有字符设为不可见
-        for (int i = 0; i < m_characterCount; i++)
+        StartCoroutine(FadeInCharacter(_typingIndex));
+        if (SelfPreprocessor.IntervalDictionary.TryGetValue(_typingIndex, out float result))
         {
-            SetSingleCharacterAlpha(i, 0);
+            yield return new WaitForSecondsRealtime(result);
         }
-
-        _typingIndex = 0;
-      
-        while (_typingIndex < m_characterCount)
+        else
         {
-            StartCoroutine(FadeInCharacter(_typingIndex));
-            
-            // 检查是否有自定义停顿时间
-            if (SelfPreprocessor.IntervalDictionary.TryGetValue(_typingIndex, out float result))
-            {
-                yield return new WaitForSecondsRealtime(result);
-            }
-            else
-            {
-                yield return new WaitForSecondsRealtime(_defaultInterval);
-            }
-
-            _typingIndex++;
+            yield return new WaitForSecondsRealtime(_defaultInterval);
         }
-
-        OnFinished.Invoke();
+        _typingIndex++;
     }
+    OnFinished.Invoke();
+}
 
     /// <summary>
     /// 设置单个字符的透明度（0-255）
@@ -335,4 +340,10 @@ public class AdvancedText : TextMeshProUGUI
             }
         }
     }
+    public void Clear()
+{
+    SetText("");
+    ForceMeshUpdate();
+    ClearRubyText();   // 已有的清除注音子物体的方法
+}
 }

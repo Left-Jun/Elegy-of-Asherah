@@ -1,19 +1,33 @@
 using System;
 using UnityEngine;
-
+using TMPro;
+using UnityEngine.UI;
+using System.Collections.Generic;
 /// <summary>
 /// 对话数据（可序列化）
 /// </summary>
 [Serializable]
 public class DialogueData
 {
-    public string Speaker;                  // 说话人
-    [Multiline] public string Content;      // 对话内容
-    public bool AutoNext;                   // 是否自动进入下一句
-    public bool NeedTyping;                 // 是否需要打字机效果
-    public bool CanQuickShow;               // 是否允许快速显示
+    public string Speaker;
+    [Multiline] public string Content;
+    public bool AutoNext;
+    public bool NeedTyping;
+    public bool CanQuickShow;
+    public Color textColor = Color.white;
+    public float fontSize = 36f;
+    public FontStyles fontStyle = FontStyles.Normal;
+
+    // 选项分支（可选）
+    public DialogueChoice[] choices;
 }
 
+[Serializable]
+public class DialogueChoice
+{
+    public string Content;                   // 选项文本
+    public EN_ShowDialogue nextDialogue;     // 选择后跳转的对话资产
+}
 /// <summary>
 /// 显示对话的事件节点
 /// </summary>
