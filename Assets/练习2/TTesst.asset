@@ -18,15 +18,27 @@ MonoBehaviour:
     Content: "\u4F60\u597D"
     AutoNext: 0
     NeedTyping: 1
-    CanQuickShow: 0
-  - Speaker: "\u65E0\u4E0A\u610F\u513F"
-    Content: "\u6811"
+    CanQuickShow: 1
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    fontSize: 72
+    fontStyle: 0
+    choices: []
+  - Speaker: "\u65E0\u4E0A\u610F\u5FD7"
+    Content: "\u6811\u610F\u5FD7"
     AutoNext: 0
     NeedTyping: 1
-    CanQuickShow: 0
-  - Speaker: "\u4F60\u597D"
+    CanQuickShow: 1
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    fontSize: 72
+    fontStyle: 0
+    choices: []
+  - Speaker: "\u610F\u5FD7\u4F60\u597D"
     Content: "\u9608\u9650\u5F00\u62D3\u8005"
     AutoNext: 0
     NeedTyping: 1
-    CanQuickShow: 0
+    CanQuickShow: 1
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    fontSize: 72
+    fontStyle: 0
+    choices: []
   boxStyle: 0
