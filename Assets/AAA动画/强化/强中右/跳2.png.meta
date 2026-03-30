@@ -113,10 +113,10 @@ TextureImporter:
       name: "\u8DF32_0"
       rect:
         serializedVersion: 2
-        x: 2
-        y: 52
-        width: 411
-        height: 365
+        x: 0
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +134,10 @@ TextureImporter:
       name: "\u8DF32_1"
       rect:
         serializedVersion: 2
-        x: 421
-        y: 25
-        width: 411
-        height: 381
+        x: 419
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -155,10 +155,10 @@ TextureImporter:
       name: "\u8DF32_2"
       rect:
         serializedVersion: 2
-        x: 839
-        y: 9
-        width: 412
-        height: 386
+        x: 838
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -176,10 +176,10 @@ TextureImporter:
       name: "\u8DF32_3"
       rect:
         serializedVersion: 2
-        x: 1259
-        y: 4
-        width: 410
-        height: 380
+        x: 1257
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,10 +197,10 @@ TextureImporter:
       name: "\u8DF32_4"
       rect:
         serializedVersion: 2
-        x: 1678
-        y: 2
-        width: 410
-        height: 372
+        x: 1676
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -218,10 +218,10 @@ TextureImporter:
       name: "\u8DF32_5"
       rect:
         serializedVersion: 2
-        x: 2120
-        y: 1
-        width: 390
-        height: 393
+        x: 2095
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -239,10 +239,10 @@ TextureImporter:
       name: "\u8DF32_6"
       rect:
         serializedVersion: 2
-        x: 2552
-        y: 25
-        width: 379
-        height: 395
+        x: 2514
+        y: 0
+        width: 419.2857
+        height: 426
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

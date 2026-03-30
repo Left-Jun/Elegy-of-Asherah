@@ -100,10 +100,10 @@ TextureImporter:
       name: "\u5F85\u673A_0"
       rect:
         serializedVersion: 2
-        x: 25
-        y: 4
-        width: 205
-        height: 405
+        x: 0
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -121,10 +121,10 @@ TextureImporter:
       name: "\u5F85\u673A_1"
       rect:
         serializedVersion: 2
-        x: 250
-        y: 4
-        width: 207
-        height: 404
+        x: 228
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -142,10 +142,10 @@ TextureImporter:
       name: "\u5F85\u673A_2"
       rect:
         serializedVersion: 2
-        x: 473
-        y: 3
-        width: 213
-        height: 404
+        x: 456
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -163,10 +163,10 @@ TextureImporter:
       name: "\u5F85\u673A_3"
       rect:
         serializedVersion: 2
-        x: 698
-        y: 3
-        width: 216
-        height: 404
+        x: 684
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -184,10 +184,10 @@ TextureImporter:
       name: "\u5F85\u673A_4"
       rect:
         serializedVersion: 2
-        x: 922
-        y: 3
-        width: 221
-        height: 402
+        x: 912
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -205,10 +205,10 @@ TextureImporter:
       name: "\u5F85\u673A_5"
       rect:
         serializedVersion: 2
-        x: 1146
-        y: 3
-        width: 224
-        height: 401
+        x: 1140
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -226,10 +226,10 @@ TextureImporter:
       name: "\u5F85\u673A_6"
       rect:
         serializedVersion: 2
-        x: 1372
-        y: 1
-        width: 226
-        height: 402
+        x: 1368
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -247,10 +247,10 @@ TextureImporter:
       name: "\u5F85\u673A_7"
       rect:
         serializedVersion: 2
-        x: 1603
-        y: 3
-        width: 222
-        height: 401
+        x: 1596
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -268,10 +268,10 @@ TextureImporter:
       name: "\u5F85\u673A_8"
       rect:
         serializedVersion: 2
-        x: 1836
-        y: 3
-        width: 218
-        height: 402
+        x: 1824
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -289,10 +289,10 @@ TextureImporter:
       name: "\u5F85\u673A_9"
       rect:
         serializedVersion: 2
-        x: 2067
-        y: 3
-        width: 214
-        height: 404
+        x: 2052
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -310,10 +310,10 @@ TextureImporter:
       name: "\u5F85\u673A_10"
       rect:
         serializedVersion: 2
-        x: 2299
-        y: 3
-        width: 210
-        height: 405
+        x: 2280
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -331,10 +331,10 @@ TextureImporter:
       name: "\u5F85\u673A_11"
       rect:
         serializedVersion: 2
-        x: 2531
-        y: 4
-        width: 207
-        height: 405
+        x: 2508
+        y: 0
+        width: 228.16667
+        height: 420
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
