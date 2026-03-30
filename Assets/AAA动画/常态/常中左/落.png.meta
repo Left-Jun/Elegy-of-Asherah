@@ -100,10 +100,10 @@ TextureImporter:
       name: "\u843D_0"
       rect:
         serializedVersion: 2
-        x: 135
-        y: 14
-        width: 261
-        height: 411
+        x: 0
+        y: 0
+        width: 394.5
+        height: 451
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -121,10 +121,10 @@ TextureImporter:
       name: "\u843D_1"
       rect:
         serializedVersion: 2
-        x: 483
-        y: 3
-        width: 275
-        height: 429
+        x: 394
+        y: 0
+        width: 394.5
+        height: 451
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -142,10 +142,10 @@ TextureImporter:
       name: "\u843D_2"
       rect:
         serializedVersion: 2
-        x: 833
-        y: 4
-        width: 287
-        height: 431
+        x: 788
+        y: 0
+        width: 394.5
+        height: 451
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -163,10 +163,10 @@ TextureImporter:
       name: "\u843D_3"
       rect:
         serializedVersion: 2
-        x: 1185
-        y: 18
-        width: 313
-        height: 415
+        x: 1182
+        y: 0
+        width: 394.5
+        height: 451
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
