@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d66f95794471154494c457c1aa6d58e, type: 3}
+  m_Name: "\u4F4E\u7ED3\u5C40"
+  m_EditorClassIdentifier: 
+  state: 0
+  datas:
+  - Speaker: 
+    Content: "\u7075\u8584\u800C\u8FD4 \u5668\u635F\u672A\u71C3\r\n\u552F\u6DFB\u65B0\u51A2\u4E00\u5EA7
+      \u4E8E\u65E0\u8C12\u4E4B\u5C71\r\n\u8DEF \u5373 \u51A2 \u589F"
+    AutoNext: 0
+    NeedTyping: 1
+    CanQuickShow: 0
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    fontSize: 80
+    fontStyle: 0
+    charDelay: 0.25
+    choices: []
+  boxStyle: 0

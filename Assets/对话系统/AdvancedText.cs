@@ -6,7 +6,7 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// Ruby注音数据，存储注音的范围和内容
+/// Ruby注音数据
 /// </summary>
 public class RubyData
 {
@@ -22,12 +22,12 @@ public class RubyData
 }
 
 /// <summary>
-/// 自定义文本预处理器，用于解析自定义标签：<数字> 表示停顿，<r=...> 和 </r> 表示注音
+/// 文本预处理器，解析自定义标签
 /// </summary>
 public class AdvancedTextPreprocessor : ITextPreprocessor
 {
-    public Dictionary<int, float> IntervalDictionary;      // 字符索引 -> 停顿时间
-    public List<RubyData> RubyList;                        // 所有注音数据列表
+    public Dictionary<int, float> IntervalDictionary;
+    public List<RubyData> RubyList;
 
     public bool TryGetRubyStartFrom(int index, out RubyData data)
     {
@@ -49,9 +49,6 @@ public class AdvancedTextPreprocessor : ITextPreprocessor
         RubyList = new List<RubyData>();
     }
 
-    /// <summary>
-    /// 预处理文本，提取标签并记录，最后移除所有标签
-    /// </summary>
     public string PreprocessText(string text)
     {
         IntervalDictionary.Clear();
@@ -66,17 +63,14 @@ public class AdvancedTextPreprocessor : ITextPreprocessor
 
             if (float.TryParse(label, out float result))
             {
-                // 停顿标签，记录索引和延迟时间（索引为前一个字符的位置）
                 IntervalDictionary[match.Index - 1] = result;
             }
             else if (Regex.IsMatch(label, "^r=.+"))
             {
-                // 注音开始标签
                 RubyList.Add(new RubyData(match.Index, label.Substring(2)));
             }
             else if (label == "/r")
             {
-                // 注音结束标签，设置最后一个注音数据的结束索引
                 if (RubyList.Count > 0)
                 {
                     RubyList[RubyList.Count - 1].EndIndex = match.Index - 1;
@@ -87,14 +81,12 @@ public class AdvancedTextPreprocessor : ITextPreprocessor
             
             if (Regex.IsMatch(label, "^sprite=.+"))
             {
-                // sprite标签替换为占位符（实际由TMP处理）
                 processingText = processingText.Insert(match.Index, "*");
             }
 
             match = Regex.Match(processingText, pattern);
         }
 
-        // 最终移除所有自定义标签，只保留显示文本
         processingText = text;
         pattern = @"(<(\d+)(\.\d+)?>)|(</r>)|(<r=.*?>)";
         processingText = Regex.Replace(processingText, pattern, "");
@@ -103,19 +95,28 @@ public class AdvancedTextPreprocessor : ITextPreprocessor
 }
 
 /// <summary>
-/// 高级文本组件，继承自TextMeshProUGUI，实现打字机效果、Ruby注音、自定义停顿
+/// 高级文本组件
 /// </summary>
 [RequireComponent(typeof(Widget))]
 public class AdvancedText : TextMeshProUGUI
 {
     public enum DisplayType
     {
-        Default,    // 直接显示
-        Fading,     // 整体淡入
-        Typing      // 逐字打印
+        Default,
+        Fading,
+        Typing
     }
 
-    private Widget _widget;                     // 用于整体淡入淡出
+    private Widget _widget;
+
+    [Header("打字机设置")]
+    [SerializeField] private float defaultCharDelay = 0.06f;
+
+    public float DefaultCharDelay
+    {
+        get => defaultCharDelay;
+        set => defaultCharDelay = Mathf.Max(0.01f, value);
+    }
 
     protected override void Awake()
     {
@@ -127,36 +128,26 @@ public class AdvancedText : TextMeshProUGUI
 
     public AdvancedText()
     {
-        textPreprocessor = new AdvancedTextPreprocessor();   // 设置自定义预处理器
+        textPreprocessor = new AdvancedTextPreprocessor();
     }
 
     private AdvancedTextPreprocessor SelfPreprocessor => (AdvancedTextPreprocessor)textPreprocessor;
 
-    public Action OnFinished;                   // 打印完成回调
+    public Action OnFinished;
     private Coroutine _typingCoroutine;
     private int _typingIndex;
-    private float _defaultInterval = 0.06f;    // 默认字符间隔
 
-    /// <summary>
-    /// 初始化，清空文本和注音子物体
-    /// </summary>
     public void Initialise()
     {
         SetText("");
         ClearRubyText();
     }
 
-    /// <summary>
-    /// 淡出整个文本（用于切换句子时的过渡）
-    /// </summary>
     public void Disappear(float duration = 0.2f)
     {
         _widget?.Fade(0, duration, null);
     }
 
-    /// <summary>
-    /// 为指定的注音数据创建注音子物体
-    /// </summary>
     private void SetRubyText(RubyData data)
     {
         GameObject pfb = Resources.Load<GameObject>("RubyText");
@@ -175,16 +166,11 @@ public class AdvancedText : TextMeshProUGUI
         }
         rubyText.SetText(data.RubyContent);
         rubyText.color = textInfo.characterInfo[data.StartIndex].color;
-
-        // 计算注音位置：位于起始字符和结束字符的顶部中点
         Vector3 startPos = textInfo.characterInfo[data.StartIndex].topLeft;
         Vector3 endPos = textInfo.characterInfo[data.EndIndex].topRight;
         ruby.transform.localPosition = (startPos + endPos) / 2;
     }
 
-    /// <summary>
-    /// 为所有注音数据创建子物体
-    /// </summary>
     private void SetAllRubyText()
     {
         foreach (var item in SelfPreprocessor.RubyList)
@@ -193,9 +179,6 @@ public class AdvancedText : TextMeshProUGUI
         }
     }
 
-    /// <summary>
-    /// 清除所有注音子物体
-    /// </summary>
     private void ClearRubyText()
     {
         foreach (var item in GetComponentsInChildren<TextMeshProUGUI>())
@@ -207,15 +190,11 @@ public class AdvancedText : TextMeshProUGUI
         }
     }
 
-    /// <summary>
-    /// 快速显示剩余所有字符（跳过打字动画）
-    /// </summary>
     public void QuickShowRemaining()
     {
         if (_typingCoroutine != null)
         {
             StopCoroutine(_typingCoroutine);
-            // 从当前索引开始，淡入所有剩余字符
             for (; _typingIndex < m_characterCount; _typingIndex++)
             {
                 StartCoroutine(FadeInCharacter(_typingIndex));
@@ -223,84 +202,62 @@ public class AdvancedText : TextMeshProUGUI
         }
     }
 
-    /// <summary>
-    /// 设置文本并开始显示效果
-    /// </summary>
-    /// <param name="content">显示内容（可包含TMP标签和自定义标签）</param>
-    /// <param name="type">显示类型</param>
-    /// <param name="fadingDuration">整体淡入持续时间</param>
-public IEnumerator SetText(string content, DisplayType type, float fadingDuration = 0.2f)
-{
-    if (_typingCoroutine != null)
+    public IEnumerator SetText(string content, DisplayType type, float fadingDuration = 0.2f)
     {
-        StopCoroutine(_typingCoroutine);
-    }
-    ClearRubyText();
+        if (_typingCoroutine != null)
+        {
+            StopCoroutine(_typingCoroutine);
+        }
+        ClearRubyText();
 
-    switch (type)
+        switch (type)
+        {
+            case DisplayType.Default:
+                SetText(content);
+                _widget.RenderOpacity = 1;
+                SetAllRubyText();
+                OnFinished?.Invoke();
+                break;
+            case DisplayType.Fading:
+                SetText(content);
+                _widget.Fade(1, fadingDuration, OnFinished.Invoke);
+                SetAllRubyText();
+                break;
+            case DisplayType.Typing:
+                _widget.Fade(1, fadingDuration, null);
+                SetText(content);
+                ForceMeshUpdate();
+                for (int i = 0; i < m_characterCount; i++)
+                {
+                    SetSingleCharacterAlpha(i, 0);
+                }
+                _typingCoroutine = StartCoroutine(Typing());
+                break;
+            default:
+                break;
+        }
+        yield break;
+    }
+
+    IEnumerator Typing()
     {
-        case DisplayType.Default:
-            SetText(content);
-            _widget.RenderOpacity = 1;
-            SetAllRubyText();
-            OnFinished?.Invoke();
-            break;
-        case DisplayType.Fading:
-            SetText(content);
-            _widget.Fade(1, fadingDuration, OnFinished.Invoke);
-            SetAllRubyText();
-            break;
-        case DisplayType.Typing:
-            // 先整体淡入（不影响字符透明度）
-            _widget.Fade(1, fadingDuration, null);
-            // 设置完整文本
-            SetText(content);
-            // 强制更新网格，获取字符信息
-            ForceMeshUpdate();
-            // 立即将所有字符设为不可见
-            for (int i = 0; i < m_characterCount; i++)
+        _typingIndex = 0;
+        while (_typingIndex < m_characterCount)
+        {
+            StartCoroutine(FadeInCharacter(_typingIndex));
+            if (SelfPreprocessor.IntervalDictionary.TryGetValue(_typingIndex, out float result))
             {
-                SetSingleCharacterAlpha(i, 0);
+                yield return new WaitForSecondsRealtime(result);
             }
-            // 启动打字机协程
-            _typingCoroutine = StartCoroutine(Typing());
-            break;
-        default:
-            break;
-    }
-    yield break; // 因为 Typing 是协程，但这里不需要等待，所以直接结束
-}
-    /// <summary>
-    /// 打字机协程：逐字符淡入显示
-    /// </summary>
-IEnumerator Typing()
-{
-    // ForceMeshUpdate(); // 不需要，已经在SetText中调用
-    // for (int i = 0; i < m_characterCount; i++) // 不需要，已经在SetText中设置
-    // {
-    //     SetSingleCharacterAlpha(i,0);
-    // }
-
-    _typingIndex = 0;
-    while (_typingIndex < m_characterCount)
-    {
-        StartCoroutine(FadeInCharacter(_typingIndex));
-        if (SelfPreprocessor.IntervalDictionary.TryGetValue(_typingIndex, out float result))
-        {
-            yield return new WaitForSecondsRealtime(result);
+            else
+            {
+                yield return new WaitForSecondsRealtime(defaultCharDelay);
+            }
+            _typingIndex++;
         }
-        else
-        {
-            yield return new WaitForSecondsRealtime(_defaultInterval);
-        }
-        _typingIndex++;
+        OnFinished.Invoke();
     }
-    OnFinished.Invoke();
-}
 
-    /// <summary>
-    /// 设置单个字符的透明度（0-255）
-    /// </summary>
     private void SetSingleCharacterAlpha(int index, byte newAlpha)
     {
         if (index < 0 || index >= textInfo.characterCount) return;
@@ -315,9 +272,6 @@ IEnumerator Typing()
         UpdateVertexData();
     }
 
-    /// <summary>
-    /// 淡入单个字符
-    /// </summary>
     IEnumerator FadeInCharacter(int index, float duration = 0.2f)
     {
         if (SelfPreprocessor.TryGetRubyStartFrom(index, out RubyData data))
@@ -340,10 +294,11 @@ IEnumerator Typing()
             }
         }
     }
+
     public void Clear()
-{
-    SetText("");
-    ForceMeshUpdate();
-    ClearRubyText();   // 已有的清除注音子物体的方法
-}
+    {
+        SetText("");
+        ForceMeshUpdate();
+        ClearRubyText();
+    }
 }

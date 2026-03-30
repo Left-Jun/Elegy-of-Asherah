@@ -24,10 +24,10 @@ MonoBehaviour:
     fontStyle: 0
     choices: []
   - Speaker: "                     \u5373\u5C06\u6D88\u5931\u7684\u7075\u9B42"
-    Content: "\u6211\u9700\u8981\u738B\u4E4B\u5362\u6069"
+    Content: "\u6211\u9700<0.7>\u8981\u738B\u4E4B\u5362\u6069"
     AutoNext: 0
     NeedTyping: 1
-    CanQuickShow: 1
+    CanQuickShow: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     fontSize: 72
     fontStyle: 0

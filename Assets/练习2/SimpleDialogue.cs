@@ -8,32 +8,35 @@ using System;
 public class SimpleDialogue : MonoBehaviour
 {
     [Header("组件引用")]
-    public AdvancedText textComponent;          // 文字组件（AdvancedText）
-    public Widget panelWidget;                  // 对话框的Widget（用于淡入淡出）
-    public Button nextButton;                   // 继续按钮（可选）
-    public TextMeshProUGUI speakerNameText;     // 说话人名字（可选）
+    public AdvancedText textComponent;
+    public Widget panelWidget;
+    public Button nextButton;
+    public TextMeshProUGUI speakerNameText;
 
     [Header("对话资产")]
-    public EN_ShowDialogue dialogueAsset;       // 对话资产（包含多句对话数据）
+    public EN_ShowDialogue dialogueAsset;
 
     [Header("设置")]
-    public bool autoNext = false;               // 是否自动下一句
-    public float fadeDuration = 0.3f;           // 淡入淡出时间
+    public bool autoNext = false;
+    public float fadeDuration = 0.3f;
 
     [Header("角色控制")]
-    public MonoBehaviour[] scriptsToDisable;    // 需要禁用的脚本（移动、跳跃等）
-    public Rigidbody2D playerRigidbody;         // 2D 刚体组件（可选，用于停止物理运动）
+    public MonoBehaviour[] scriptsToDisable;
+    public Rigidbody2D playerRigidbody;
 
     private List<DialogueData> dialogueDataList = new List<DialogueData>();
     private int currentIndex = 0;
     private bool isTyping = false;
     private bool isActive = false;
     private bool waitingForChoice = false;
-    private bool[] originalScriptStates;        // 保存脚本原始启用状态
-    private bool originalRigidbodyKinematic;    // 保存刚体原始 isKinematic 状态
+    private bool[] originalScriptStates;
+    private bool originalRigidbodyKinematic;
+
+    private EnergyDrainController energyDrain;
 
     void Awake()
     {
+        energyDrain = FindObjectOfType<EnergyDrainController>();
         if (dialogueAsset != null && dialogueAsset.datas != null)
         {
             foreach (var data in dialogueAsset.datas)
@@ -55,20 +58,19 @@ public class SimpleDialogue : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 外部调用：开始对话
-    /// </summary>
     public void StartDialogue()
     {
         if (isActive) return;
         if (dialogueDataList.Count == 0) return;
+    if (energyDrain != null) energyDrain.SetPause(true);
+    SafetyTimer timer = FindObjectOfType<SafetyTimer>();
+    if (timer != null) timer.PauseTimer();
 
         isActive = true;
         currentIndex = 0;
         isTyping = false;
         waitingForChoice = false;
 
-        // 淡入对话框
         if (panelWidget != null)
         {
             panelWidget.RenderOpacity = 0;
@@ -76,10 +78,7 @@ public class SimpleDialogue : MonoBehaviour
         }
         if (textComponent != null) textComponent.Clear();
 
-        // 禁用角色控制
         DisablePlayerControl();
-
-        // 显示第一句
         NextSentence();
     }
 
@@ -99,7 +98,6 @@ public class SimpleDialogue : MonoBehaviour
         if (currentIndex < dialogueDataList.Count)
         {
             var data = dialogueDataList[currentIndex];
-            // 应用样式
             if (textComponent != null)
             {
                 textComponent.color = data.textColor;
@@ -109,15 +107,14 @@ public class SimpleDialogue : MonoBehaviour
             if (speakerNameText != null)
                 speakerNameText.text = data.Speaker;
 
-            // 如果有选项，显示选项面板
             if (data.choices != null && data.choices.Length > 0)
             {
                 ShowChoices(data.choices);
-                currentIndex++; // 推进索引，避免重复显示同一句
+                currentIndex++;
             }
             else
             {
-                StartCoroutine(PrintCurrentSentence(data.Content));
+                StartCoroutine(PrintCurrentSentence(data.Content, data.charDelay));
                 currentIndex++;
             }
         }
@@ -131,7 +128,6 @@ public class SimpleDialogue : MonoBehaviour
     {
         waitingForChoice = true;
 
-        // 准备 UIManager 需要的 ChoiceData 数组（仅文本）
         var uiChoiceDatas = new ChoiceData[choices.Length];
         for (int i = 0; i < choices.Length; i++)
         {
@@ -142,16 +138,15 @@ public class SimpleDialogue : MonoBehaviour
         {
             waitingForChoice = false;
             var selected = choices[selectedIndex];
-            selected.onSelect?.Invoke();   // 触发自定义事件
+            selected.onSelect?.Invoke();
 
             if (selected.nextDialogue != null)
             {
-                // 切换对话资产并重新加载
                 dialogueAsset = selected.nextDialogue;
                 ReloadDialogueData();
                 currentIndex = 0;
                 textComponent.Clear();
-                NextSentence();  // 开始新对话
+                NextSentence();
             }
             else
             {
@@ -174,16 +169,22 @@ public class SimpleDialogue : MonoBehaviour
         }
     }
 
-    IEnumerator PrintCurrentSentence(string content)
+    IEnumerator PrintCurrentSentence(string content, float customCharDelay)
     {
         isTyping = true;
         textComponent.Clear();
-        yield return null;   // 等待一帧，避免闪现
+        yield return null;
+
+        float originalDelay = textComponent.DefaultCharDelay;
+        if (customCharDelay > 0)
+            textComponent.DefaultCharDelay = customCharDelay;
 
         bool finished = false;
         textComponent.OnFinished = () => finished = true;
         textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Typing));
         yield return new WaitUntil(() => finished);
+
+        textComponent.DefaultCharDelay = originalDelay;
 
         isTyping = false;
         if (autoNext) NextSentence();
@@ -191,6 +192,9 @@ public class SimpleDialogue : MonoBehaviour
 
     void EndDialogue()
     {
+            if (energyDrain != null) energyDrain.SetPause(false);
+            SafetyTimer timer = FindObjectOfType<SafetyTimer>();
+    if (timer != null) timer.ResumeTimer();
         if (nextButton != null) nextButton.interactable = false;
         if (panelWidget != null)
         {
@@ -199,7 +203,6 @@ public class SimpleDialogue : MonoBehaviour
                 gameObject.SetActive(false);
                 isActive = false;
                 waitingForChoice = false;
-                // 恢复角色控制
                 EnablePlayerControl();
             });
         }
@@ -211,11 +214,8 @@ public class SimpleDialogue : MonoBehaviour
         }
     }
 
-    // ==================== 角色控制方法 ====================
-
     private void DisablePlayerControl()
     {
-        // 保存并禁用移动脚本
         originalScriptStates = new bool[scriptsToDisable.Length];
         for (int i = 0; i < scriptsToDisable.Length; i++)
         {
@@ -226,7 +226,6 @@ public class SimpleDialogue : MonoBehaviour
             }
         }
 
-        // 处理 2D 刚体
         if (playerRigidbody != null)
         {
             originalRigidbodyKinematic = playerRigidbody.isKinematic;
@@ -237,7 +236,6 @@ public class SimpleDialogue : MonoBehaviour
 
     private void EnablePlayerControl()
     {
-        // 恢复移动脚本
         if (originalScriptStates != null)
         {
             for (int i = 0; i < originalScriptStates.Length; i++)
@@ -249,7 +247,6 @@ public class SimpleDialogue : MonoBehaviour
             }
         }
 
-        // 恢复刚体状态
         if (playerRigidbody != null)
         {
             playerRigidbody.isKinematic = originalRigidbodyKinematic;

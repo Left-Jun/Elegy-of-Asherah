@@ -1,14 +1,17 @@
 using UnityEngine;
 
-public class DialogueTrigger : MonoBehaviour
+public class DialogueTrigger0 : MonoBehaviour
 {
     public GameObject dialoguePanel;      // 对话框面板（挂载 SimpleDialogue 的物体）
     public KeyCode triggerKey = KeyCode.E; // 触发按键
 
     private SimpleDialogue simpleDialogue;
 
+    private EnergyDrainController energyDrain;
+
     void Start()
     {
+        energyDrain = FindObjectOfType<EnergyDrainController>();
         if (dialoguePanel != null)
         {
             simpleDialogue = dialoguePanel.GetComponent<SimpleDialogue>();

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EmotionalPlatform : MonoBehaviour
 {
-    // 平台需要在哪种情绪下激活
-    public MaskControl.EmotionState activeInEmotion = MaskControl.EmotionState.Neutral;
+    // 平台需要在哪种状态下激活
+    public MaskControl.State activeInState = MaskControl.State.Normal;
 
     private SpriteRenderer spriteRenderer;
     private Collider2D platformCollider;
@@ -15,23 +15,23 @@ public class EmotionalPlatform : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         platformCollider = GetComponent<Collider2D>();
 
-        // 1. 找到玩家的情绪控制中心
+        // 1. 找到玩家的状态控制中心
         MaskControl maskControl = FindObjectOfType<MaskControl>();
         
         if (maskControl != null)
         {
-            // 2. 订阅情绪变化事件
-            maskControl.OnEmotionChangedEvent += OnEmotionChanged;
-            // 3. 立即根据当前情绪更新一次状态
-            OnEmotionChanged(maskControl.currentEmotion);
+            // 2. 订阅状态变化事件（注意事件名称已改为 OnStateChangedEvent）
+            maskControl.OnStateChangedEvent += OnStateChanged;
+            // 3. 立即根据当前状态更新一次平台可见性
+            OnStateChanged(maskControl.currentState);
         }
     }
 
-    // 当情绪变化时，这个函数会被调用
-    private void OnEmotionChanged(MaskControl.EmotionState newEmotion)
+    // 当状态变化时，这个函数会被调用
+    private void OnStateChanged(MaskControl.State newState)
     {
-        // 判断当前情绪是否是我需要的情绪
-        bool shouldBeActive = (newEmotion == activeInEmotion);
+        // 判断当前状态是否是我需要的状态
+        bool shouldBeActive = (newState == activeInState);
         
         // 根据判断结果显示/隐藏平台
         if(spriteRenderer != null) spriteRenderer.enabled = shouldBeActive;
@@ -44,7 +44,7 @@ public class EmotionalPlatform : MonoBehaviour
         MaskControl maskControl = FindObjectOfType<MaskControl>();
         if (maskControl != null)
         {
-            maskControl.OnEmotionChangedEvent -= OnEmotionChanged;
+            maskControl.OnStateChangedEvent -= OnStateChanged;
         }
     }
 }

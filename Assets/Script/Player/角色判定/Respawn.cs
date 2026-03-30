@@ -5,23 +5,38 @@ using UnityEngine;
 public class GetRespawn : MonoBehaviour
 {
     private Rigidbody2D rbody;
-    private Vector2 respawnPosition;//重生位置
-    // Start is called before the first frame update
+    private Vector2 respawnPosition;
+
+    [SerializeField] private float respawnDelay = 0.3f; // 重生延迟时间（秒），可在Inspector面板中调整
 
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
-        respawnPosition = GetComponent<Checkpoints>().checkPoint.position;//重生位置初始化
+        respawnPosition = GetComponent<Checkpoints>().checkPoint.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        respawnPosition = GetComponent<Checkpoints>().checkPoint.position;//重生位置更新
+        respawnPosition = GetComponent<Checkpoints>().checkPoint.position;
         Debug.Log("Respawn Position: " + respawnPosition);
     }
+
     public void Respawn()
     {
-        transform.position = respawnPosition;//重生位置
+        // 取消之前还未执行的延迟调用（避免重复重生时多个延迟叠加）
+        CancelInvoke(nameof(PerformRespawn));
+        // 延迟执行真正的重生逻辑
+        Invoke(nameof(PerformRespawn), respawnDelay);
+    }
+
+    private void PerformRespawn()
+    {
+        transform.position = respawnPosition;
+        // 可选：重置刚体速度，防止残留的动量影响重生后的状态
+        if (rbody != null)
+        {
+            rbody.velocity = Vector2.zero;
+            rbody.angularVelocity = 0f;
+        }
     }
 }
