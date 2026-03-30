@@ -5,6 +5,7 @@
 [B/b]uild/
 [B/b]uilds/
 [L/l]ogs/
+[Ll]ogs/
 [U/u]nityConfiguration.gen.cpp
 [A/a]ssets/AssetStoreTools*
 
@@ -45,4 +46,4 @@ sysinfo.txt
 # --- 自定义排除 (可选) ---
 # 如果你有存放测试包的文件夹，可以在这里添加
 # /Assets/Plugins/Editor/JetBrains*
-*.log
+**/*.log
