@@ -93,6 +93,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -100,12 +113,12 @@ TextureImporter:
       name: "\u51B2_0"
       rect:
         serializedVersion: 2
-        x: 18
-        y: 384
-        width: 338
-        height: 342
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 0
+        y: 377
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -121,12 +134,12 @@ TextureImporter:
       name: "\u51B2_1"
       rect:
         serializedVersion: 2
-        x: 397
+        x: 371
         y: 377
-        width: 323
-        height: 348
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -142,12 +155,12 @@ TextureImporter:
       name: "\u51B2_2"
       rect:
         serializedVersion: 2
-        x: 755
-        y: 425
-        width: 340
-        height: 316
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 742
+        y: 377
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -163,12 +176,12 @@ TextureImporter:
       name: "\u51B2_3"
       rect:
         serializedVersion: 2
-        x: 1132
-        y: 403
-        width: 337
-        height: 327
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1113
+        y: 377
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -184,12 +197,12 @@ TextureImporter:
       name: "\u51B2_4"
       rect:
         serializedVersion: 2
-        x: 1486
-        y: 411
-        width: 358
-        height: 316
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1484
+        y: 377
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -205,12 +218,12 @@ TextureImporter:
       name: "\u51B2_5"
       rect:
         serializedVersion: 2
-        x: 1856
-        y: 444
-        width: 361
-        height: 284
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1855
+        y: 377
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -226,12 +239,12 @@ TextureImporter:
       name: "\u51B2_6"
       rect:
         serializedVersion: 2
-        x: 6
-        y: 64
-        width: 356
-        height: 289
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 0
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -247,12 +260,12 @@ TextureImporter:
       name: "\u51B2_7"
       rect:
         serializedVersion: 2
-        x: 401
-        y: 39
-        width: 323
-        height: 308
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 371
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -268,12 +281,12 @@ TextureImporter:
       name: "\u51B2_8"
       rect:
         serializedVersion: 2
-        x: 758
-        y: 28
-        width: 335
-        height: 330
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 742
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -289,12 +302,12 @@ TextureImporter:
       name: "\u51B2_9"
       rect:
         serializedVersion: 2
-        x: 1136
-        y: 23
-        width: 332
-        height: 336
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1113
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -310,12 +323,12 @@ TextureImporter:
       name: "\u51B2_10"
       rect:
         serializedVersion: 2
-        x: 1500
-        y: 11
-        width: 342
-        height: 338
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1484
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -331,12 +344,12 @@ TextureImporter:
       name: "\u51B2_11"
       rect:
         serializedVersion: 2
-        x: 1864
-        y: 27
-        width: 350
-        height: 323
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1855
+        y: 0
+        width: 371.33334
+        height: 377
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
