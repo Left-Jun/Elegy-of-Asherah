@@ -601,7 +601,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalMusic: {fileID: 8300000, guid: e3a0cac464ac8f04e8735e2486fee79c, type: 3}
   enhancedMusic: {fileID: 8300000, guid: 37f336f2b6b49b044b50e1a25ee98e68, type: 3}
-  endingMusic: {fileID: 8300000, guid: 8921b7f7feeeacc429a2e955e8f14bac, type: 3}
+  highEndingMusic: {fileID: 0}
+  normalEndingMusic: {fileID: 0}
+  lowEndingMusic: {fileID: 0}
+  deathEndingMusic: {fileID: 0}
   fadeDuration: 1
   maxVolume: 0.7
 --- !u!1 &523237914
@@ -200028,7 +200031,7 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1723589785
