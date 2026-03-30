@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class MaskControl : MonoBehaviour
 {
-    [Header("背景容器")]
-    [SerializeField] private GameObject bgNormal;
-    [SerializeField] private GameObject bgEnhanced;
+    [Header("背景容器（按灵能阶段）")]
+    [SerializeField] private GameObject[] normalBackgrounds;   // 索引0=高,1=中,2=低
+    [SerializeField] private GameObject[] enhancedBackgrounds; // 索引0=高,1=中,2=低
 
     [Header("普通状态视觉子物体（左右独立，按灵能阶段）")]
     [SerializeField] private GameObject normalLeftVisual_High;
@@ -152,25 +152,43 @@ public class MaskControl : MonoBehaviour
 
     private void UpdateDirectionalVisual()
     {
+        // 1. 更新角色视觉
         DisableAllVisuals();
-
-        if (bgNormal != null) bgNormal.SetActive(false);
-        if (bgEnhanced != null) bgEnhanced.SetActive(false);
-
         bool facingRight = GetCurrentFacing() > 0;
         GameObject targetVisual = GetTargetVisual(currentState, currentEnergyStage, facingRight);
-
         if (targetVisual != null)
             targetVisual.SetActive(true);
 
-        switch (currentState)
+        // 2. 更新背景（根据状态和灵能阶段）
+        UpdateBackground();
+    }
+
+    private void UpdateBackground()
+    {
+        int stageIndex = (int)currentEnergyStage; // High=0, Medium=1, Low=2
+
+        // 先禁用所有背景
+        if (normalBackgrounds != null)
         {
-            case State.Normal:
-                if (bgNormal != null) bgNormal.SetActive(true);
-                break;
-            case State.Enhanced:
-                if (bgEnhanced != null) bgEnhanced.SetActive(true);
-                break;
+            foreach (var bg in normalBackgrounds)
+                if (bg != null) bg.SetActive(false);
+        }
+        if (enhancedBackgrounds != null)
+        {
+            foreach (var bg in enhancedBackgrounds)
+                if (bg != null) bg.SetActive(false);
+        }
+
+        // 激活当前状态对应的背景
+        if (currentState == State.Normal)
+        {
+            if (normalBackgrounds != null && stageIndex < normalBackgrounds.Length && normalBackgrounds[stageIndex] != null)
+                normalBackgrounds[stageIndex].SetActive(true);
+        }
+        else
+        {
+            if (enhancedBackgrounds != null && stageIndex < enhancedBackgrounds.Length && enhancedBackgrounds[stageIndex] != null)
+                enhancedBackgrounds[stageIndex].SetActive(true);
         }
     }
 
