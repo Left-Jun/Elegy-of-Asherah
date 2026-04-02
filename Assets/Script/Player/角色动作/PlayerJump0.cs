@@ -30,7 +30,7 @@ public class PlayerJump : MonoBehaviour
     private float jumpTimeCounter;//跳跃时间计时器
     private bool airjumpChance;//空中跳跃机会
     //============================================================
-    private Wallcheck wallcheck;//贴墙状态
+    private WallCheck wallcheck;//贴墙状态
     private Coroutine wallJumpCoroutine;//蹬墙跳协程引用
     //============================================================
     [Header("状态（通用）")]
@@ -42,12 +42,14 @@ public class PlayerJump : MonoBehaviour
     public bool isJumping;//跳跃状态
     public bool isFalling;//下落状态
     //====================================================
+    public bool facingWall { get; private set; } // 是否面向墙壁（新增）
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         //animator = GetComponent<Animator>();
-        wallcheck = GetComponentInChildren<Wallcheck>();
+        wallcheck = GetComponentInChildren<WallCheck>();
     }
 
     // Update is called once per frame
@@ -125,38 +127,45 @@ public class PlayerJump : MonoBehaviour
     //蹬墙跳函数
     private void WallJumping()
     {
-        if(wallcheck.isWall)
+        // 获取角色朝向和墙壁方向
+        int facingDir = (int)Mathf.Sign(transform.localScale.x);
+        int wallDir = wallcheck.wallDirection;
+        // 是否面向墙壁（有墙且朝向与墙壁方向相同）
+        facingWall = wallcheck.isWall && (facingDir == wallDir);
+        
+        if (facingWall)
         {
             airjumpChance = true;//重置空中跳跃机会为真
         }
 
-        if(wallcheck.isWall && !isGrounded && !walljumpHeld){
-            rb.velocity = new Vector2(rb.velocity.x,rb.velocity.y*0.95f);//减少下落速度
-        }
-        if(wallcheck.isWall && walljumpHeld && !isGrounded && !toWallJump)
+        if (facingWall && !isGrounded && !walljumpHeld)
         {
-            rb.velocity = new Vector2(rb.velocity.x,Mathf.Max(rb.velocity.y * 0.3f, -2f));//减少下落速度
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.95f);//减少下落速度
+        }
+        if (facingWall && walljumpHeld && !isGrounded && !toWallJump)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y * 0.3f, -2f));//减少下落速度
         }
 
-        if(wallcheck.isWall && !isGrounded && jumpTrigger)
+        if (facingWall && !isGrounded && jumpTrigger)
         {
             jumpSound.Play();//播放跳跃音效
-            float wallDirection = GetComponent<Wallcheck>().wallDirection; //获取墙壁方向（假设角色面向右为正，面向左为负）
+            float wallDirection = GetComponent<WallCheck>().wallDirection; //获取墙壁方向
             Animator currentAnim = GetCurrentAnimator();
             if (currentAnim != null) currentAnim.SetTrigger("isWalljump");
-             if (wallJumpCoroutine != null)
+            if (wallJumpCoroutine != null)
             {
                 StopCoroutine(wallJumpCoroutine);
             }
             wallJumpCoroutine = StartCoroutine(ToWallJump());
             // 完全重置垂直速度，确保每次蹬墙跳获得统一的跳跃力
             Vector2 newVelocity = rb.velocity;
-            newVelocity.y = 0; // 完全重置垂直速度
+            newVelocity.y = 0;
             rb.velocity = newVelocity;
-            rb.velocity = new Vector2(-wallDirection * wallJumpForceX, wallJumpForceY);//施加跳跃力
-            airjumpChance = true;//重置空中跳跃机会为真
-            jumpTrigger = false;//重置跳跃触发器
-            jumpTimeCounter = 0f;//重置跳跃时间计时器
+            rb.velocity = new Vector2(-wallDirection * wallJumpForceX, wallJumpForceY);
+            airjumpChance = true;
+            jumpTrigger = false;
+            jumpTimeCounter = 0f;
         }
     }
     //蹬墙跳协程
@@ -168,14 +177,13 @@ public class PlayerJump : MonoBehaviour
         toWallJump = false;
         Debug.Log("ToWallJump: 结束设置为false");
         wallJumpCoroutine = null;
-
     }
 //============================================================================================================================
     //跳跃输入检测函数
     private void HandleJumpInput()
     {
         // 检测按键按下（跳跃触发器）
-        if (!inputOnCooldown && IsJumpKeyDown()&& airjumpChance)//防止重复输入且有空中跳跃机会
+        if (!inputOnCooldown && IsJumpKeyDown()&& airjumpChance)
         {
             jumpTrigger = true;
             jumpHeld = true;
@@ -279,7 +287,7 @@ public class PlayerJump : MonoBehaviour
     //地面检测函数
     private void GroundeCheck()
     {
-        isGrounded = GetComponent<Groundcheck>().isGrounded;
+        isGrounded = GetComponent<GroundCheck>().isGrounded;
     }
     
     //跳跃状态更新函数
@@ -317,7 +325,6 @@ public class PlayerJump : MonoBehaviour
         return null;
     }
 }
-
 /*        //斜向上走路
         if(!jumpPressed && rb.velocity.y > 0)
         {

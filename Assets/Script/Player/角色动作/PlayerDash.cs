@@ -1,580 +1,145 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerDash : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private Animator animator;
-    private PlayerJump playerJump;
-    private PlayerMove playerMove;
-    private Wallcheck wallcheck;
-    private MaskControl maskControl;
-    
-    [Header("冲刺基本设置")]
-    [SerializeField] private float defaultDashSpeed = 30f;
-    [SerializeField] private float defaultDashDuration = 0.15f;
-    [SerializeField] private float defaultDashCooldown = 0.5f;
-    
-    [Header("冲刺类型设置")]
-    public bool groundDashOnly = false;
-    public bool airDash = true;
-    [SerializeField] private int defaultMaxAirDashes = 1;
-    public bool wallDash = true;
-    public bool diagonalDash = true;
-    
-    [Header("冲刺方向设置")]
-    public bool useInputDirection = true;
-    public bool useFacingDirection = false;
-    public Vector2 fixedDashDirection = Vector2.right;
-    
-    [Header("水平冲刺设置")]
-    public bool horizontalDashOnly = false; // 新增：是否只进行X轴冲刺
-    public bool freezeYVelocity = true; // 新增：是否冻结Y轴速度
-    private float originalGravityScale; // 记录原始重力比例
-    private float originalVerticalVelocity; // 记录冲刺前的垂直速度
-    
-    [Header("冲刺物理效果")]
-    public bool ignoreGravity = true;
-    public float dashEndDeceleration = 0.8f;
+    [Header("冲刺参数")]
+    [SerializeField] private float dashSpeed = 30f;
+    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 0.5f;
+    [SerializeField] private int maxAirDashes = 1;
+    [SerializeField] private AnimationCurve speedCurve;
     
     [Header("冲刺效果")]
-    [SerializeField] private AudioSource dashSound;
-    [SerializeField] private ParticleSystem dashParticles;
-    [SerializeField] private GameObject dashTrail;
-    [SerializeField] private float trailDuration = 0.3f;
+    [SerializeField] private bool freezeYVelocity = true;
     
-    // 实际使用的参数
-    private float dashSpeed;
-    private float dashDuration;
-    private float dashCooldown;
-    private int maxAirDashes;
+    [Header("音频")]
+    [SerializeField] private AudioSource dashSound;
+    
+    private Rigidbody2D rb;
+    private PlayerJump playerJump;
+    private WallCheck wallcheck;
     
     public bool isDashing { get; private set; }
-    public bool canDash { get; private set; }
-    public int airDashCount { get; private set; }
-    
-    // 内部变量
+    private bool canDash = true;
+    private int airDashCount;
     private float dashCooldownTimer = 0f;
-    private float dashDurationTimer = 0f;
-    private Vector2 dashDirection = Vector2.right;
-    private bool dashTrigger;
-    private Coroutine dashCoroutine;
+    private Vector2 dashDirection;
     
-    // 输入相关
-    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
-    [SerializeField] private KeyCode altDashKey = KeyCode.RightShift;
-    
-    // 冲刺轨迹相关
-    private GameObject activeTrail;
+    // 用于检测 facingWall 状态变化
+    private bool lastFacingWall = false;
     
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
         playerJump = GetComponent<PlayerJump>();
-        playerMove = GetComponent<PlayerMove>();
-        wallcheck = GetComponentInChildren<Wallcheck>();
-        maskControl = GetComponent<MaskControl>();
-        
-        InitializeDashStats();
-        
-        canDash = true;
+        wallcheck = GetComponentInChildren<WallCheck>();
         airDashCount = maxAirDashes;
-        
-        // 记录原始重力比例
-        originalGravityScale = rb.gravityScale;
-        
-        if (dashParticles == null)
-        {
-            dashParticles = GetComponentInChildren<ParticleSystem>();
-        }
-    }
-    
-    private void InitializeDashStats()
-    {
-        if (maskControl != null && maskControl.currentStats != null)
-        {
-            dashSpeed = maskControl.currentStats.dashSpeed;
-            dashDuration = maskControl.currentStats.dashDuration;
-            dashCooldown = maskControl.currentStats.dashCooldown;
-            maxAirDashes = maskControl.currentStats.maxAirDashes;
-        }
-        else
-        {
-            dashSpeed = defaultDashSpeed;
-            dashDuration = defaultDashDuration;
-            dashCooldown = defaultDashCooldown;
-            maxAirDashes = defaultMaxAirDashes;
-        }
     }
     
     void Update()
     {
-        UpdateDashStatsFromMaskControl();
-        HandleDashInput();
-        UpdateCooldown();
-        UpdateDashState();
-        UpdateAnimation();
-    }
-    
-    void FixedUpdate()
-    {
-        if (isDashing)
-        {
-            ExecuteDash();
-        }
-    }
-    
-    private void UpdateDashStatsFromMaskControl()
-    {
-        if (maskControl != null && maskControl.currentStats != null)
-        {
-            dashSpeed = maskControl.currentStats.dashSpeed;
-            dashCooldown = maskControl.currentStats.dashCooldown;
-            maxAirDashes = maskControl.currentStats.maxAirDashes;
-            
-            if (airDashCount < maxAirDashes)
-            {
-                airDashCount = maxAirDashes;
-            }
-        }
-    }
-    
-    private void HandleDashInput()
-    {
-        bool dashKeyDown = Input.GetKeyDown(dashKey) || Input.GetKeyDown(altDashKey);
-        
-        if (dashKeyDown && canDash && !dashTrigger)
-        {
-            dashTrigger = true;
-        }
-    }
-    
-    private void UpdateCooldown()
-    {
+        // 冷却计时
         if (!canDash && !isDashing)
         {
             dashCooldownTimer -= Time.deltaTime;
-            
-            if (dashCooldownTimer <= 0f)
-            {
-                canDash = true;
-                dashCooldownTimer = 0f;
-            }
+            if (dashCooldownTimer <= 0f) canDash = true;
         }
-    }
-    
-    private void UpdateDashState()
-    {
+        
+        // 地面时重置空中冲刺次数（每帧都重置，因为落地后应该立即恢复）
         if (playerJump != null && playerJump.isGrounded)
-        {
             airDashCount = maxAirDashes;
-        }
         
-        if (wallcheck != null && wallcheck.isWall)
+        // 面向墙壁状态变化检测（仅在进入面向墙壁时重置一次）
+        bool currentFacingWall = playerJump != null && !playerJump.isGrounded && playerJump.facingWall;
+        if (currentFacingWall && !lastFacingWall)
         {
-            RefreshDashOnWall();
+            // 刚进入面向墙壁状态，重置冲刺次数和冷却
+            airDashCount = maxAirDashes;
+            canDash = true;
+            dashCooldownTimer = 0f;
+            Debug.Log("进入面向墙壁状态，重置冲刺次数");
         }
+        lastFacingWall = currentFacingWall;
         
-        bool dashAllowed = CheckDashConditions();
-        
-        if (dashTrigger && dashAllowed && !isDashing)
+        // 冲刺输入检测
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {
-            StartDash();
-            dashTrigger = false;
-        }
-        
-        if (isDashing)
-        {
-            dashDurationTimer -= Time.deltaTime;
-            
-            if (dashDurationTimer <= 0f)
+            if (canDash && !isDashing)
             {
-                EndDash();
+                bool hasDashChance = (playerJump != null && playerJump.isGrounded) || airDashCount > 0;
+                if (hasDashChance)
+                    StartDash();
             }
         }
-    }
-    
-    private bool CheckDashConditions()
-    {
-        if (!canDash) return false;
-        
-        if (groundDashOnly && playerJump != null && !playerJump.isGrounded)
-        {
-            return false;
-        }
-        
-        if (!groundDashOnly && airDash)
-        {
-            if (playerJump != null && !playerJump.isGrounded)
-            {
-                if (airDashCount <= 0)
-                {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
     }
     
     private void StartDash()
     {
-        // 记录冲刺前的垂直速度
-        originalVerticalVelocity = rb.velocity.y;
-        
-        // 确定冲刺方向
         DetermineDashDirection();
-        
-        // 如果启用水平冲刺，强制设置Y轴分量为0
-        if (horizontalDashOnly)
-        {
-            dashDirection.y = 0;
-            if (dashDirection.magnitude < 0.01f)
-            {
-                dashDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            }
-            dashDirection.Normalize();
-        }
-        
-        // 设置状态
-        isDashing = true;
-        dashDurationTimer = dashDuration;
-        
-        // 消耗空中冲刺次数
-        if (playerJump != null && !playerJump.isGrounded && airDash)
-        {
+        if (playerJump != null && !playerJump.isGrounded)
             airDashCount--;
-        }
-        
-        // 冲刺时处理重力和垂直速度
-        if (ignoreGravity || (horizontalDashOnly && freezeYVelocity))
-        {
-            // 记录原始重力比例
-            originalGravityScale = rb.gravityScale;
-            // 设置重力比例为0以冻结垂直运动
-            rb.gravityScale = 0f;
-            
-            // 如果启用垂直速度冻结，立即将垂直速度设为0
-            if (horizontalDashOnly && freezeYVelocity)
-            {
-                Vector2 currentVelocity = rb.velocity;
-                currentVelocity.y = 0f;
-                rb.velocity = currentVelocity;
-            }
-        }
-        
-        // 播放音效
-        if (dashSound != null)
-        {
-            dashSound.Play();
-        }
-        
-        // 播放粒子效果
-        if (dashParticles != null)
-        {
-            dashParticles.Play();
-            
-            var main = dashParticles.main;
-            main.startRotation = Mathf.Atan2(dashDirection.y, dashDirection.x) * Mathf.Rad2Deg * Mathf.Deg2Rad;
-        }
-        
-        // 生成冲刺拖尾
-        if (dashTrail != null)
-        {
-            if (dashCoroutine != null)
-            {
-                StopCoroutine(dashCoroutine);
-            }
-            dashCoroutine = StartCoroutine(SpawnDashTrail());
-        }
-        
-        // 触发动画
-        if (animator != null)
-        {
-            animator.SetTrigger("Dash");
-        }
-        
-        Debug.Log($"冲刺开始！方向: {dashDirection}, 水平冲刺: {horizontalDashOnly}, 冻结Y轴: {freezeYVelocity}");
+        StartCoroutine(DashCoroutine());
     }
     
     private void DetermineDashDirection()
     {
-        if (useInputDirection)
+        if (playerJump != null && playerJump.facingWall && wallcheck != null)
         {
-            float horizontal = Input.GetAxisRaw("Horizontal");
-            float vertical = Input.GetAxisRaw("Vertical");
-            
-            if (horizontal == 0 && vertical == 0)
-            {
-                dashDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-            }
-            else
-            {
-                dashDirection = new Vector2(horizontal, diagonalDash ? vertical : 0).normalized;
-            }
-        }
-        else if (useFacingDirection)
-        {
-            dashDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+            float wallDir = wallcheck.wallDirection;
+            dashDirection = new Vector2(-wallDir, 0f);
         }
         else
         {
-            dashDirection = fixedDashDirection.normalized;
+            float facing = Mathf.Sign(transform.localScale.x);
+            dashDirection = new Vector2(facing, 0f);
         }
-        
-        // 检查蹬墙冲刺
-        if (wallDash && wallcheck != null && wallcheck.isWall)
-        {
-            float wallDirection = wallcheck.wallDirection;
-            
-            if (Mathf.Abs(wallDirection) > 0.1f)
-            {
-                // 如果启用水平冲刺，蹬墙冲刺也限制为水平
-                if (horizontalDashOnly)
-                {
-                    dashDirection = new Vector2(-wallDirection, 0f).normalized;
-                }
-                else
-                {
-                    dashDirection = new Vector2(-wallDirection, 0.3f).normalized;
-                }
-                Debug.Log("蹬墙冲刺！方向: " + dashDirection);
-            }
-        }
+        if (freezeYVelocity) dashDirection.y = 0f;
+        dashDirection.Normalize();
     }
     
-    private void ExecuteDash()
+    private IEnumerator DashCoroutine()
     {
-        Vector2 dashVelocity = dashDirection * dashSpeed;
-        
-        // 如果启用水平冲刺并冻结Y轴速度，保持垂直速度为0
-        if (horizontalDashOnly && freezeYVelocity)
-        {
-            dashVelocity.y = 0f;
-        }
-        // 如果不是水平冲刺且不忽略重力，保持当前垂直速度
-        else if (!ignoreGravity)
-        {
-            dashVelocity.y = rb.velocity.y;
-        }
-        
-        rb.velocity = dashVelocity;
-    }
-    
-    private void EndDash()
-    {
-        isDashing = false;
+        isDashing = true;
         canDash = false;
         dashCooldownTimer = dashCooldown;
         
-        // 恢复重力
-        if (ignoreGravity || (horizontalDashOnly && freezeYVelocity))
+        float originalGravity = rb.gravityScale;
+        if (freezeYVelocity) rb.gravityScale = 0f;
+        
+        float elapsed = 0f;
+        while (elapsed < dashDuration)
         {
-            rb.gravityScale = originalGravityScale;
+            float t = elapsed / dashDuration;
+            float speedMultiplier = speedCurve.Evaluate(t);
+            float currentSpeed = dashSpeed * speedMultiplier;
+            Vector2 velocity = dashDirection * currentSpeed;
+            if (freezeYVelocity) velocity.y = 0f;
+            rb.velocity = velocity;
+            elapsed += Time.deltaTime;
+            yield return null;
         }
         
-        // 如果启用了水平冲刺，冲刺结束后重置垂直速度
-        if (horizontalDashOnly)
-        {
-            Vector2 finalVelocity = rb.velocity;
-            
-            // 应用减速效果到水平方向
-            if (dashEndDeceleration < 1f)
-            {
-                finalVelocity.x *= dashEndDeceleration;
-            }
-            
-            // 垂直速度设为0，让重力立即开始作用
-            finalVelocity.y = 0f;
-            rb.velocity = finalVelocity;
-            
-            Debug.Log("水平冲刺结束，垂直速度重置为0");
-        }
-        else
-        {
-            // 正常冲刺的减速效果
-            if (dashEndDeceleration < 1f)
-            {
-                rb.velocity *= dashEndDeceleration;
-            }
-        }
-        
-        // 停止粒子效果
-        if (dashParticles != null)
-        {
-            dashParticles.Stop();
-        }
-        
-        // 停止拖尾效果协程
-        if (dashCoroutine != null)
-        {
-            StopCoroutine(dashCoroutine);
-            dashCoroutine = null;
-        }
-        
-        // 销毁拖尾
-        if (activeTrail != null)
-        {
-            Destroy(activeTrail, 0.5f);
-        }
-        
-        Debug.Log("冲刺结束");
-    }
-    
-    private IEnumerator SpawnDashTrail()
-    {
-        if (dashTrail == null) yield break;
-        
-        float elapsedTime = 0f;
-        
-        while (elapsedTime < trailDuration && isDashing)
-        {
-            GameObject trailInstance = Instantiate(dashTrail, transform.position, Quaternion.identity);
-            
-            SpriteRenderer playerSprite = GetComponent<SpriteRenderer>();
-            if (playerSprite != null)
-            {
-                SpriteRenderer trailRenderer = trailInstance.GetComponent<SpriteRenderer>();
-                if (trailRenderer != null)
-                {
-                    trailRenderer.sprite = playerSprite.sprite;
-                    trailRenderer.flipX = playerSprite.flipX;
-                    trailRenderer.flipY = playerSprite.flipY;
-                }
-            }
-            
-            SpriteRenderer trailSprite = trailInstance.GetComponent<SpriteRenderer>();
-            if (trailSprite != null)
-            {
-                trailSprite.color = new Color(1f, 1f, 1f, 0.5f);
-            }
-            
-            if (activeTrail == null)
-            {
-                activeTrail = trailInstance;
-            }
-            else
-            {
-                Destroy(trailInstance, 0.1f);
-            }
-            
-            elapsedTime += 0.05f;
-            yield return new WaitForSeconds(0.05f);
-        }
-    }
-    
-    private void UpdateAnimation()
-    {
-        if (animator != null)
-        {
-            animator.SetBool("isDashing", isDashing);
-        }
-    }
-    
-    private void RefreshDashOnWall()
-    {
-        if (playerJump != null && !playerJump.isGrounded)
-        {
-            airDashCount = maxAirDashes;
-            Debug.Log("贴墙刷新冲刺次数，当前可用空中冲刺: " + airDashCount);
-        }
-    }
-    
-    // 外部调用的强制冲刺方法
-    public void ForceDash(Vector2 direction, bool isHorizontal = false)
-    {
-        if (!isDashing)
-        {
-            dashDirection = direction.normalized;
-            
-            // 如果是水平冲刺，强制Y轴分量为0
-            if (isHorizontal)
-            {
-                dashDirection.y = 0;
-                if (dashDirection.magnitude < 0.01f)
-                {
-                    dashDirection = Vector2.right;
-                }
-                dashDirection.Normalize();
-                horizontalDashOnly = true;
-            }
-            
-            StartDash();
-        }
-    }
-    
-    // 重置冲刺状态
-    public void ResetDash()
-    {
         isDashing = false;
-        canDash = true;
-        airDashCount = maxAirDashes;
-        dashCooldownTimer = 0f;
+        rb.gravityScale = originalGravity;
+        if (freezeYVelocity)
+            rb.velocity = new Vector2(rb.velocity.x * 0.8f, 0f);
         
-        // 恢复重力
-        rb.gravityScale = originalGravityScale;
-        
-        // 停止所有协程
-        if (dashCoroutine != null)
-        {
-            StopCoroutine(dashCoroutine);
-            dashCoroutine = null;
-        }
+        if (dashSound != null) dashSound.Play();
     }
     
-    // 检查是否正在冲刺
-    public bool IsDashing()
-    {
-        return isDashing;
-    }
+    // ========== 兼容旧脚本的公共方法 ==========
+    public Vector2 GetDashDirection() => dashDirection;
     
-    // 获取当前冲刺方向
-    public Vector2 GetDashDirection()
-    {
-        return dashDirection;
-    }
+    public void SetDashSpeed(float speed) => dashSpeed = speed;
     
-    // 设置是否可以冲刺
-    public void SetCanDash(bool value)
-    {
-        canDash = value;
-    }
+    public int GetCurrentAirDashCount() => airDashCount;
     
-    // 设置冲刺速度
-    public void SetDashSpeed(float speed)
+    public void AddAirDash(int amount)
     {
-        dashSpeed = speed;
-    }
-    
-    // 增加空中冲刺次数
-    public void AddAirDash(int amount = 1)
-    {
-        airDashCount = Mathf.Min(airDashCount + amount, maxAirDashes);
-    }
-    
-    // 获取当前可用空中冲刺次数
-    public int GetCurrentAirDashCount()
-    {
-        return airDashCount;
-    }
-    
-    // 获取最大空中冲刺次数
-    public int GetMaxAirDashCount()
-    {
-        return maxAirDashes;
-    }
-    
-    // 设置是否只进行水平冲刺
-    public void SetHorizontalDashOnly(bool value)
-    {
-        horizontalDashOnly = value;
-    }
-    
-    // 设置是否冻结Y轴速度
-    public void SetFreezeYVelocity(bool value)
-    {
-        freezeYVelocity = value;
+        if (amount > 0)
+            airDashCount = Mathf.Min(airDashCount + amount, maxAirDashes);
+        else if (amount < 0)
+            Debug.LogWarning("AddAirDash called with negative amount, ignored.");
     }
 }

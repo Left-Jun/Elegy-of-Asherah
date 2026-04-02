@@ -9,7 +9,7 @@ public class PlayerAnimation : MonoBehaviour
     private Animator animator;
     private PlayerMove playermove;
     private PlayerJump playerjump;
-    private Wallcheck wallcheck;
+    private WallCheck wallcheck;
     private PlayerDash playerdash;
 
     void Start()
@@ -22,7 +22,7 @@ public class PlayerAnimation : MonoBehaviour
         // 获取脚本组件（根据您的项目结构，这些组件通常在父物体上）
         playermove = GetComponentInParent<PlayerMove>();
         playerjump = GetComponentInParent<PlayerJump>();
-        wallcheck = GetComponentInParent<Wallcheck>();
+        wallcheck = GetComponentInParent<WallCheck>();
         playerdash = GetComponentInParent<PlayerDash>();
 
         // 输出引用状态以便调试
@@ -45,8 +45,12 @@ public class PlayerAnimation : MonoBehaviour
         }
         else
         {
-            // 状态判断顺序：贴墙 > 跳跃 > 下落 > 跑 > 待机
-            if (wallcheck.isWall && !playerjump.isGrounded)
+            // 获取角色朝向和墙壁方向
+            int facingDir = (int)Mathf.Sign(transform.root.localScale.x);
+            int wallDir = wallcheck.wallDirection;
+            bool shouldBeInWall = !playerjump.isGrounded && wallcheck.isWall && facingDir == wallDir;
+
+            if (shouldBeInWall)
                 currentState = AnimationState.InWall;
             else if (playerjump.isJumping)
                 currentState = AnimationState.Jump;
@@ -61,8 +65,5 @@ public class PlayerAnimation : MonoBehaviour
         // 更新 Animator 的 States 参数
         int stateValue = (int)currentState;
         animator.SetInteger("States", stateValue);
-
-        // 可选：输出当前状态用于调试
-        // Debug.Log($"当前动画状态: {currentState}, 值: {stateValue}");
     }
 }
