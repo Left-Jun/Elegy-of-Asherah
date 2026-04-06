@@ -6,7 +6,7 @@ using TMPro;
 public class DialogueData
 {
     [Header("基本信息")] public string Speaker; [Multiline] public string Content;
-    [Header("显示控制")] public bool AutoNext = false; public bool NeedTyping = true; public bool CanQuickShow = true;
+    [Header("显示控制")] public bool AutoNext = false; public bool NeedTyping = true; public bool CanQuickShow = true;public float displayDelay = 0f;   // 新增：文字显示后等待多少秒再自动下一句（仅当 AutoNext=true 时生效）
     [Header("文字样式")] public Color textColor = Color.white; public float fontSize = 36f; public FontStyles fontStyle = FontStyles.Normal;
     [Header("打字机设置")] public float charDelay = -1f;
     [Header("对话框样式")] public int boxStyle = 0;

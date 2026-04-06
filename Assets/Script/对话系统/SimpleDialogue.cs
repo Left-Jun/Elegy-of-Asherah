@@ -18,6 +18,7 @@ public class SimpleDialogue : MonoBehaviour
     public EN_ShowDialogue dialogueAsset;
 
     [Header("设置（全局默认，会被每句数据覆盖）")]
+    private float currentDisplayDelay;
     public bool autoNext = false;
     public float fadeDuration = 0.3f;
 
@@ -125,6 +126,7 @@ public class SimpleDialogue : MonoBehaviour
             currentCanQuickShow = data.CanQuickShow;
             currentNeedTyping = data.NeedTyping;
             currentAutoNext = data.AutoNext;
+            currentDisplayDelay = data.displayDelay;   // 时间
 
             // 切换背景图片
             if (backgroundImage != null && backgroundSprites != null && data.boxStyle >= 0 && data.boxStyle < backgroundSprites.Length)
@@ -160,35 +162,45 @@ public class SimpleDialogue : MonoBehaviour
         }
     }
 
-    IEnumerator PrintCurrentSentenceNoTyping(string content)
+IEnumerator PrintCurrentSentenceNoTyping(string content)
+{
+    isTyping = true;
+    textComponent.Clear();
+    yield return null;
+    bool finished = false;
+    textComponent.OnFinished = () => finished = true;
+    textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Default));
+    yield return new WaitUntil(() => finished);
+    isTyping = false;
+    
+    if (currentAutoNext)
     {
-        isTyping = true;
-        textComponent.Clear();
-        yield return null;
-        // 直接显示全部文字（使用 Fading 或 Default，这里用 Default 瞬间显示）
-        textComponent.SetText(content, AdvancedText.DisplayType.Default);
-        // 等待一帧确保显示完成
-        yield return null;
-        isTyping = false;
-        if (currentAutoNext) NextSentence();
+        if (currentDisplayDelay > 0)
+            yield return new WaitForSecondsRealtime(currentDisplayDelay);
+        NextSentence();
     }
+}
 
-    IEnumerator PrintCurrentSentence(string content, float customCharDelay)
+IEnumerator PrintCurrentSentence(string content, float customCharDelay)
+{
+    isTyping = true;
+    textComponent.Clear();
+    yield return null;
+    float originalDelay = textComponent.DefaultCharDelay;
+    if (customCharDelay > 0) textComponent.DefaultCharDelay = customCharDelay;
+    bool finished = false;
+    textComponent.OnFinished = () => finished = true;
+    textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Typing));
+    yield return new WaitUntil(() => finished);
+    textComponent.DefaultCharDelay = originalDelay;
+    isTyping = false;
+    if (currentAutoNext)
     {
-        isTyping = true;
-        textComponent.Clear();
-        yield return null;
-        float originalDelay = textComponent.DefaultCharDelay;
-        if (customCharDelay > 0) textComponent.DefaultCharDelay = customCharDelay;
-        bool finished = false;
-        textComponent.OnFinished = () => finished = true;
-        textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Typing));
-        yield return new WaitUntil(() => finished);
-        textComponent.DefaultCharDelay = originalDelay;
-        isTyping = false;
-        if (currentAutoNext) NextSentence();
+        if (currentDisplayDelay > 0)
+            yield return new WaitForSecondsRealtime(currentDisplayDelay);
+        NextSentence();
     }
-
+}
     void ShowChoices(DialogueChoice[] choices)
     {
         waitingForChoice = true;

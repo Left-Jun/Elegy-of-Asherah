@@ -11,6 +11,8 @@ public class SimplePauseMenu : MonoBehaviour
     
     void Update()
     {
+            // 如果告示牌图片正在显示，不处理暂停菜单的 ESC
+        if (AttachmentImage.IsShowing) return;
         if (Input.GetKeyDown(KeyCode.Escape))//检测到Esc键按下
         {
             if (isPaused)//如果已经暂停
