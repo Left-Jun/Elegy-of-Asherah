@@ -12,11 +12,11 @@ public class Widget : MonoBehaviour
 
     [SerializeField] private AnimationCurve _fadingCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-    public float RenderOpacity
-    {
-        get => _canvasGroup.alpha;
-        set => _canvasGroup.alpha = value;
-    }
+public float RenderOpacity
+{
+    get => _canvasGroup != null ? _canvasGroup.alpha : 0f;
+    set { if (_canvasGroup != null) _canvasGroup.alpha = value; }
+}
 
     private void Awake()
     {

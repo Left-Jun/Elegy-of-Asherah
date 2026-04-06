@@ -7,22 +7,29 @@ using System;
 
 public class SimpleDialogue : MonoBehaviour
 {
-    [Header("组件引用")]
+    [Header("组件引用（请手动拖拽）")]
     public AdvancedText textComponent;
     public Widget panelWidget;
     public Button nextButton;
     public TextMeshProUGUI speakerNameText;
+    public Image backgroundImage;
 
     [Header("对话资产")]
     public EN_ShowDialogue dialogueAsset;
 
-    [Header("设置")]
+    [Header("设置（全局默认，会被每句数据覆盖）")]
     public bool autoNext = false;
     public float fadeDuration = 0.3f;
 
     [Header("角色控制")]
     public MonoBehaviour[] scriptsToDisable;
     public Rigidbody2D playerRigidbody;
+
+    [Header("灵能控制")]
+    public EnergyDrainController energyDrain;
+
+    [Header("对话框背景样式")]
+    public Sprite[] backgroundSprites;
 
     private List<DialogueData> dialogueDataList = new List<DialogueData>();
     private int currentIndex = 0;
@@ -32,27 +39,32 @@ public class SimpleDialogue : MonoBehaviour
     private bool[] originalScriptStates;
     private bool originalRigidbodyKinematic;
 
-    private EnergyDrainController energyDrain;
+    // 当前句子的临时设置
+    private bool currentCanQuickShow;
+    private bool currentNeedTyping;
+    private bool currentAutoNext;
 
     void Awake()
     {
-        energyDrain = FindObjectOfType<EnergyDrainController>();
+        // 强制确保 Widget 组件存在
+        if (panelWidget == null) panelWidget = GetComponent<Widget>();
+        if (panelWidget == null) panelWidget = gameObject.AddComponent<Widget>();
+        if (GetComponent<CanvasGroup>() == null) gameObject.AddComponent<CanvasGroup>();
+
         if (dialogueAsset != null && dialogueAsset.datas != null)
         {
             foreach (var data in dialogueAsset.datas)
-            {
                 dialogueDataList.Add(data);
-            }
         }
         else
         {
-            Debug.LogError("SimpleDialogue: 对话资产为空或没有数据！");
+            Debug.LogError("SimpleDialogue: 对话资产为空！");
         }
     }
 
-    void Start()
+    private void OnEnable()
     {
-        if (gameObject.activeSelf)
+        if (!isActive && dialogueDataList.Count > 0)
         {
             StartDialogue();
         }
@@ -60,22 +72,25 @@ public class SimpleDialogue : MonoBehaviour
 
     public void StartDialogue()
     {
+        if (panelWidget == null)
+        {
+            Debug.LogError("StartDialogue: panelWidget 为 null");
+            return;
+        }
         if (isActive) return;
         if (dialogueDataList.Count == 0) return;
-    if (energyDrain != null) energyDrain.SetPause(true);
-    SafetyTimer timer = FindObjectOfType<SafetyTimer>();
-    if (timer != null) timer.PauseTimer();
 
         isActive = true;
         currentIndex = 0;
         isTyping = false;
         waitingForChoice = false;
 
-        if (panelWidget != null)
-        {
-            panelWidget.RenderOpacity = 0;
-            panelWidget.Fade(1, fadeDuration, null);
-        }
+        if (TimeManager.Instance != null) TimeManager.Instance.Pause();
+        if (energyDrain != null) energyDrain.SetPause(true);
+
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
+        panelWidget.RenderOpacity = 0;
+        panelWidget.Fade(1, fadeDuration, null);
         if (textComponent != null) textComponent.Clear();
 
         DisablePlayerControl();
@@ -85,9 +100,16 @@ public class SimpleDialogue : MonoBehaviour
     void Update()
     {
         if (!isActive || waitingForChoice) return;
-        if (!autoNext && !isTyping && Input.GetButtonDown("Submit"))
+        if (Input.GetButtonDown("Submit"))
         {
-            NextSentence();
+            if (isTyping && currentCanQuickShow)
+            {
+                textComponent?.QuickShowRemaining();
+            }
+            else if (!isTyping)
+            {
+                NextSentence();
+            }
         }
     }
 
@@ -98,6 +120,17 @@ public class SimpleDialogue : MonoBehaviour
         if (currentIndex < dialogueDataList.Count)
         {
             var data = dialogueDataList[currentIndex];
+
+            // 记录当前句子的设置
+            currentCanQuickShow = data.CanQuickShow;
+            currentNeedTyping = data.NeedTyping;
+            currentAutoNext = data.AutoNext;
+
+            // 切换背景图片
+            if (backgroundImage != null && backgroundSprites != null && data.boxStyle >= 0 && data.boxStyle < backgroundSprites.Length)
+                backgroundImage.sprite = backgroundSprites[data.boxStyle];
+
+            // 文字样式
             if (textComponent != null)
             {
                 textComponent.color = data.textColor;
@@ -114,7 +147,10 @@ public class SimpleDialogue : MonoBehaviour
             }
             else
             {
-                StartCoroutine(PrintCurrentSentence(data.Content, data.charDelay));
+                if (currentNeedTyping)
+                    StartCoroutine(PrintCurrentSentence(data.Content, data.charDelay));
+                else
+                    StartCoroutine(PrintCurrentSentenceNoTyping(data.Content));
                 currentIndex++;
             }
         }
@@ -124,22 +160,47 @@ public class SimpleDialogue : MonoBehaviour
         }
     }
 
+    IEnumerator PrintCurrentSentenceNoTyping(string content)
+    {
+        isTyping = true;
+        textComponent.Clear();
+        yield return null;
+        // 直接显示全部文字（使用 Fading 或 Default，这里用 Default 瞬间显示）
+        textComponent.SetText(content, AdvancedText.DisplayType.Default);
+        // 等待一帧确保显示完成
+        yield return null;
+        isTyping = false;
+        if (currentAutoNext) NextSentence();
+    }
+
+    IEnumerator PrintCurrentSentence(string content, float customCharDelay)
+    {
+        isTyping = true;
+        textComponent.Clear();
+        yield return null;
+        float originalDelay = textComponent.DefaultCharDelay;
+        if (customCharDelay > 0) textComponent.DefaultCharDelay = customCharDelay;
+        bool finished = false;
+        textComponent.OnFinished = () => finished = true;
+        textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Typing));
+        yield return new WaitUntil(() => finished);
+        textComponent.DefaultCharDelay = originalDelay;
+        isTyping = false;
+        if (currentAutoNext) NextSentence();
+    }
+
     void ShowChoices(DialogueChoice[] choices)
     {
         waitingForChoice = true;
-
         var uiChoiceDatas = new ChoiceData[choices.Length];
         for (int i = 0; i < choices.Length; i++)
-        {
             uiChoiceDatas[i] = new ChoiceData { Content = choices[i].Content };
-        }
 
-        Action<int> onChoiceConfirm = (selectedIndex) =>
+        Action<int> onChoiceConfirm = (idx) =>
         {
             waitingForChoice = false;
-            var selected = choices[selectedIndex];
+            var selected = choices[idx];
             selected.onSelect?.Invoke();
-
             if (selected.nextDialogue != null)
             {
                 dialogueAsset = selected.nextDialogue;
@@ -148,12 +209,8 @@ public class SimpleDialogue : MonoBehaviour
                 textComponent.Clear();
                 NextSentence();
             }
-            else
-            {
-                EndDialogue();
-            }
+            else EndDialogue();
         };
-
         UIManager.CreateDialogueChocies(uiChoiceDatas, onChoiceConfirm, 0);
     }
 
@@ -163,38 +220,12 @@ public class SimpleDialogue : MonoBehaviour
         if (dialogueAsset != null && dialogueAsset.datas != null)
         {
             foreach (var data in dialogueAsset.datas)
-            {
                 dialogueDataList.Add(data);
-            }
         }
-    }
-
-    IEnumerator PrintCurrentSentence(string content, float customCharDelay)
-    {
-        isTyping = true;
-        textComponent.Clear();
-        yield return null;
-
-        float originalDelay = textComponent.DefaultCharDelay;
-        if (customCharDelay > 0)
-            textComponent.DefaultCharDelay = customCharDelay;
-
-        bool finished = false;
-        textComponent.OnFinished = () => finished = true;
-        textComponent.StartCoroutine(textComponent.SetText(content, AdvancedText.DisplayType.Typing));
-        yield return new WaitUntil(() => finished);
-
-        textComponent.DefaultCharDelay = originalDelay;
-
-        isTyping = false;
-        if (autoNext) NextSentence();
     }
 
     void EndDialogue()
     {
-            if (energyDrain != null) energyDrain.SetPause(false);
-            SafetyTimer timer = FindObjectOfType<SafetyTimer>();
-    if (timer != null) timer.ResumeTimer();
         if (nextButton != null) nextButton.interactable = false;
         if (panelWidget != null)
         {
@@ -204,6 +235,8 @@ public class SimpleDialogue : MonoBehaviour
                 isActive = false;
                 waitingForChoice = false;
                 EnablePlayerControl();
+                if (TimeManager.Instance != null) TimeManager.Instance.Resume();
+                if (energyDrain != null) energyDrain.SetPause(false);
             });
         }
         else
@@ -211,6 +244,8 @@ public class SimpleDialogue : MonoBehaviour
             gameObject.SetActive(false);
             isActive = false;
             EnablePlayerControl();
+            if (TimeManager.Instance != null) TimeManager.Instance.Resume();
+            if (energyDrain != null) energyDrain.SetPause(false);
         }
     }
 
@@ -225,7 +260,6 @@ public class SimpleDialogue : MonoBehaviour
                 scriptsToDisable[i].enabled = false;
             }
         }
-
         if (playerRigidbody != null)
         {
             originalRigidbodyKinematic = playerRigidbody.isKinematic;
@@ -241,15 +275,10 @@ public class SimpleDialogue : MonoBehaviour
             for (int i = 0; i < originalScriptStates.Length; i++)
             {
                 if (scriptsToDisable[i] != null)
-                {
                     scriptsToDisable[i].enabled = originalScriptStates[i];
-                }
             }
         }
-
         if (playerRigidbody != null)
-        {
             playerRigidbody.isKinematic = originalRigidbodyKinematic;
-        }
     }
 }

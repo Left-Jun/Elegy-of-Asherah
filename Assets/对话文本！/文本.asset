@@ -23,15 +23,17 @@ MonoBehaviour:
     fontSize: 72
     fontStyle: 0
     charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6811\u7075"
     Content: "\u6CE8\u610F\uFF0C\u4E0D\u80FD\u5728\u5730\u4E0B\u5446\u7684\u592A\u4E45\uFF01\n\u5B89\u5168\u65F6\u95F4\u5185\u8FD4\u56DE\u5426\u5219\u7075\u80FD\u5C06\u8FC5\u901F\u6D41\u901D\uFF01"
     AutoNext: 0
     NeedTyping: 1
-    CanQuickShow: 0
+    CanQuickShow: 1
     textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
     fontSize: 72
     fontStyle: 0
     charDelay: -1
+    boxStyle: 0
     choices: []
   boxStyle: 0

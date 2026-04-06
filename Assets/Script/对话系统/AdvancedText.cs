@@ -190,17 +190,19 @@ public class AdvancedText : TextMeshProUGUI
         }
     }
 
-    public void QuickShowRemaining()
+public void QuickShowRemaining()
+{
+    if (_typingCoroutine != null)
     {
-        if (_typingCoroutine != null)
+        StopCoroutine(_typingCoroutine);
+        for (; _typingIndex < m_characterCount; _typingIndex++)
         {
-            StopCoroutine(_typingCoroutine);
-            for (; _typingIndex < m_characterCount; _typingIndex++)
-            {
-                StartCoroutine(FadeInCharacter(_typingIndex));
-            }
+            StartCoroutine(FadeInCharacter(_typingIndex));
         }
+        // 快速显示完成后，触发打印完成回调
+        OnFinished?.Invoke();
     }
+}
 
     public IEnumerator SetText(string content, DisplayType type, float fadingDuration = 0.2f)
     {

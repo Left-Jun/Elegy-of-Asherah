@@ -40,6 +40,7 @@ public class EnergyDrainController : MonoBehaviour
 
     private void Update()
     {
+        if (TimeManager.Instance != null && TimeManager.Instance.IsPaused) return; // 新增
         if (isPaused) return;  // 暂停时不进行流失
 
         if (energyManager == null || maskControl == null || safetyTimer == null) return;

@@ -46,6 +46,7 @@ public class SafetyTimer : MonoBehaviour
 
     private void Update()
     {
+        if (TimeManager.Instance != null && TimeManager.Instance.IsPaused) return;
         if (!isRunning) return;
         if (isPaused) return;        // 手动暂停（对话等）时不倒计时
 

@@ -17,281 +17,309 @@ MonoBehaviour:
   - Speaker: "\u6816\u679D"
     Content: "\u4F60\u9192\u4E86\uFF0C\u5B69\u5B50\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3018868, g: 0.18298326, b: 0.064079754, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3018868, g: 0.18298326, b: 0.064079754, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u83AB\u8981\u60CA\u60F6\u2014\u2014\u6B64\u5730\u4ECD\u5728\u6BCD\u6811\u7684\u6B8B\u836B\u4E4B\u4E0B\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u6B64\u5730\u662F\u2026\u2026\u4F55\u5904\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u4F60"
     Content: "\u6211\u611F\u5230\u8840\u8109\u6DF1\u5904\uFF0C\u4F3C\u6709\u65E0\u540D\u4E4B\u7269\u6D41\u52A8\u2026\u2026"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u90A3\u662F\u201C\u7075\u80FD\u201D\uFF0C\u8FD9\u662F\u4F60\u4E0E\u751F\u4FF1\u6765\u7684\u8840\u8109\uFF0C\u4E5F\u662F\u6BCD\u6811\u2014\u2014\u4E9A\u820D\u62C9\u2014\u2014\u6700\u540E\u7684\u6C14\u606F\uFF0C\u5728\u4F60\u8EAB\u4E2D\u56DE\u8361\u7684\u4F59\u54CD\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u800C\u4F60\u2014\u2014\u662F\u8FD9\u4E16\u4E0A\u6700\u540E\u4E00\u540D\u201C\u6839\u8BED\u8005\u201D\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u2026\u2026\u6839\u8BED\u8005\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u8046\u542C\u6839\u8109\u4F4E\u8BED\u4E4B\u4EBA\uFF0C\u627F\u8F7D\u7075\u80FD\u6D41\u52A8\u4E4B\u4EBA\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u4E5F\u662F\u552F\u4E00\u80FD\u5C06\u5176\u5E26\u56DE\u6BCD\u6811\u4E4B\u4EBA\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u4E9A\u820D\u62C9\u2026\u6BCD\u4EB2\u4E4B\u6811\uFF1F\u4E3A\u4F55\u6B64\u95F4\uFF0C\u5982\u6B64\u5BC2\u9759\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u7075\u80FD\u7684\u8109\u8F6E\u5DF2\u7136\u505C\u6EDE\u3002\u4E16\u754C\u5DF2\u6C89\u5165\u201C\u6839\u8109\u8870\u4EA1\u4E4B\u7EAA\u201D\u2014\u2014\u88AB\u79F0\u4E3A\u201C\u5927\u67AF\u840E\u7EAA\u201D\u7684\u6F2B\u957F\u9EC4\u660F\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u6BCD\u6811\u6B8B\u5B58\u7684\u610F\u8BC6\uFF0C\u4E3A\u4F60\u7EF4\u7CFB\u8FD9\u7247\u6700\u540E\u7684\u5B89\u5B81\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u542C\u6E05\u695A\uFF0C\u5B69\u5B50\u3002\u82E5\u4F60\u79BB\u53BB\u6B64\u5730\uFF0C\u7075\u80FD\u4FBF\u5982\u6D41\u6C99\uFF0C\u81EA\u4F60\u547D\u8109\u4E2D\u6D88\u901D\u3002\u5F53\u5B83\u6D41\u5C3D\uFF0C\u4F60\u4FBF\u5982\u6C99\u5854\u822C\u5D29\u584C\uFF0C\u5F52\u4E8E\u5C18\u571F\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u6211\u5F53\u5982\u4F55\u5B58\u6D3B\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u5411\u4E0B\u3002\u6B65\u5165\u90A3\u7247\u5D29\u673D\u7684\u6839\u987B\u8FF7\u5BAB\uFF0C\u62FE\u53D6\u5176\u4E2D\u6563\u843D\u7684\u7075\u80FD\u4F59\u70EC\uFF0C\u6536\u96C6\u5B83\u4EEC\uFF0C\u5EF6\u7EED\u4F60\u7684\u5B58\u5728\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u4E5F\u5E26\u8D70\u6BCD\u6811\u9057\u843D\u7684\u5723\u9AA8\uFF08\u4E9A\u820D\u62C9\u9057\u9AA8\uFF09\uFF0C\u552F\u6709\u7942\u7684\u9057\u9AA8\uFF0C\u80FD\u5728\u4E9A\u820D\u62C9\u67AF\u69C1\u7684\u8EAF\u5E72\u4E0A\uFF0C\u91CD\u94F8\u901A\u8DEF\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u5F53\u4F60\u6536\u96C6\u8DB3\u591F\u4E4B\u7269\u2014\u2014\u56DE\u5230\u5730\u8868\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u800C\u540E\u5411\u4E0A\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u5411\u4E0A\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u643A\u4F60\u6240\u96C6\u7684\u4E00\u5207\uFF0C\u6500\u4E0A\u4E9A\u820D\u62C9\u5316\u4E3A\u7EDD\u58C1\u7684\u8EAF\u5E72\uFF0C\u5728\u7942\u5782\u6B7B\u7684\u8109\u7EDC\u4E0A\uFF0C\u91CD\u7B51\u901A\u5F80\u82CD\u7A79\u7684\u9053\u8DEF\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u82E5\u6211\u505C\u4E0B\u5462\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u7075\u80FD\u4F1A\u7EE7\u7EED\u6D41\u901D\u3002\u65E0\u8BBA\u5730\u4E0A\uFF0C\u8FD8\u662F\u6811\u4E0A\u2014\u2014\u65F6\u95F4\uFF0C\u4ECE\u4E0D\u5BBD\u6055\u8FDF\u7591\u4E4B\u4EBA\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u76F4\u81F3\u91CD\u8FD4\u7942\u6C89\u5BC2\u7684\u5FC3\u810F\u2014\u2014\u90A3\u6811\u51A0\u4E4B\u5DC5\uFF0C\u5C06\u4F60\u6240\u643A\u7684\u4E00\u5207\u7075\u80FD\u2014\u2014\u5F52\u8FD8\u4E8E\u5F7C\u5904\u3002\u90A3\u662F\u6B64\u884C\u552F\u4E00\u7684\u610F\u4E49\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u4E5F\u662F\u8FD9\u4E2A\u4E16\u754C\u6700\u540E\u7684\u53EF\u80FD\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u4F60"
     Content: "\u82E5\u6211\u8E0F\u4E0A\u6B64\u9014\uFF0C\u5C06\u8FCE\u6765\u600E\u6837\u7684\u7EC8\u5C40\uFF1F"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 0
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u65B0\u8109\u6216\u5C06\u518D\u751F\uFF0C\u6216\u2026\u2026\u4F60\u7684\u5BBF\u547D\u65E9\u5DF2\u94ED\u523B\u5728\u6839\u987B\u6DF1\u5904\u3002\u4F60\u53EA\u9700\u524D\u884C\uFF0C\u6B65\u5165\u90A3\u67AF\u840E\u7684\u9EC4\u660F\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u542F\u7A0B\u5427\u3002\u5E87\u62A4\u4E4B\u5730\u5373\u5C06\u6D88\u6563\u3002\u5728\u4E07\u7269\u5F52\u4E8E\u6C38\u5BC2\u4E4B\u524D\uFF0C\u4E3A\u6BCD\u6811\u732E\u4E0A\u7942\u7684\u8840\u8109\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   - Speaker: "\u6816\u679D"
     Content: "\u613F\u4E9A\u820D\u62C9\u7684\u9634\u5F71\u5E87\u4F51\u4F60\u3002"
     AutoNext: 0
-    NeedTyping: 0
-    CanQuickShow: 0
-    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 0}
-    fontSize: 0
+    NeedTyping: 1
+    CanQuickShow: 1
+    textColor: {r: 0.3019608, g: 0.18431373, b: 0.06666667, a: 1}
+    fontSize: 72
     fontStyle: 0
-    charDelay: 0
+    charDelay: -1
+    boxStyle: 1
     choices: []
   boxStyle: 0
