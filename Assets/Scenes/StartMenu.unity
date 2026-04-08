@@ -1384,9 +1384,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1397866725}
-        m_TargetAssemblyTypeName: Start, Assembly-CSharp
-        m_MethodName: GameStart
+      - m_Target: {fileID: 5877550697002597006}
+        m_TargetAssemblyTypeName: MapSelector, Assembly-CSharp
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1845,6 +1845,7 @@ GameObject:
   - component: {fileID: 3359772038232269407}
   - component: {fileID: 4909951770414398797}
   - component: {fileID: 5877550697002597005}
+  - component: {fileID: 5877550697002597006}
   m_Layer: 5
   m_Name: "\u5F00\u59CB\u6E38\u620F"
   m_TagString: Untagged
@@ -1865,6 +1866,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pressedScale: {x: 0.9, y: 0.9, z: 1}
+--- !u!114 &5877550697002597006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877550697002597004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9db7f364937d8a545802b7a91584ff47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapSceneNames:
+  - "\u7EC3\u4E60"
+  - "\u7EC3\u4E60 1"
+  - "\u7EC3\u4E60 2"
+  - "\u7EC3\u4E60 3"
 --- !u!114 &6294682161094531944
 MonoBehaviour:
   m_ObjectHideFlags: 0
