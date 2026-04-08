@@ -53,6 +53,7 @@ public class MaskControl : MonoBehaviour
         public float dashDuration = 0.15f;
         public float dashCooldown = 0.5f;
         public int maxAirDashes = 1;
+        public bool canAirJump = true;   // 是否允许空中二段跳
     }
 
     public StateStats currentStats;
@@ -255,6 +256,7 @@ public class MaskControl : MonoBehaviour
             playerJump.additionalFallForce = currentStats.additionalFallForce;
             playerJump.wallJumpForceX = currentStats.wallJumpForceX;
             playerJump.wallJumpForceY = currentStats.wallJumpForceY;
+            playerJump.SetCanAirJump(currentStats.canAirJump);
         }
         if (playerDash != null)
         {

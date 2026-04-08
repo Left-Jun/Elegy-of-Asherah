@@ -15,13 +15,16 @@ MonoBehaviour:
   state: 0
   datas:
   - Speaker: 
-    Content: 
+    Content: "\u5BB9 \u5668 \u7A7A \u7A7A  \u884C \u8DEF \u957F \u957F\r\n<size=125>\u6B64\u8EAB
+      \u672A\u80FD\u6210\u5668"
     AutoNext: 0
     NeedTyping: 1
     CanQuickShow: 0
+    displayDelay: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     fontSize: 80
     fontStyle: 0
     charDelay: 0.25
+    boxStyle: 0
     choices: []
   boxStyle: 0

@@ -15,11 +15,11 @@ MonoBehaviour:
   state: 0
   datas:
   - Speaker: 
-    Content: "<size=125>\u5BB9 \u5668 \u7A7A \u7A7A\r</size>\n<size=90%><i>Created
-      by Limenauts\r\n</i></size>\r\n<size=50%>\u6309F\u8FD4\u56DE\u4E3B\u83DC\u5355"
+    Content: "<i>Created by Limenauts\r\n\u9608\u9650\u5F00\u62D3\u8005 \u5F00\u53D1\n</i></size>\r\n\n\n<size=50%>\u6309F\u8FD4\u56DE\u4E3B\u83DC\u5355"
     AutoNext: 0
     NeedTyping: 1
     CanQuickShow: 0
+    displayDelay: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     fontSize: 72
     fontStyle: 0

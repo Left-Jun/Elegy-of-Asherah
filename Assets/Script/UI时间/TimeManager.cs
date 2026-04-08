@@ -10,15 +10,14 @@ public class TimeManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        // 单例模式，但不跨场景存活
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        // 注意：没有 DontDestroyOnLoad
     }
 
     /// <summary>

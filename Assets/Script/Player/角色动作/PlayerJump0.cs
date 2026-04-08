@@ -29,6 +29,17 @@ public class PlayerJump : MonoBehaviour
     // ===================================
     private float jumpTimeCounter;//跳跃时间计时器
     private bool airjumpChance;//空中跳跃机会
+    private bool canAirJump = true;   // 默认允许
+
+public void SetCanAirJump(bool can)
+{
+    canAirJump = can;
+    if (!canAirJump)
+    {
+        // 如果当前状态不允许二段跳，则重置空中跳跃机会，防止残留
+        airjumpChance = false;
+    }
+}
     //============================================================
     private WallCheck wallcheck;//贴墙状态
     private Coroutine wallJumpCoroutine;//蹬墙跳协程引用
@@ -89,7 +100,7 @@ public class PlayerJump : MonoBehaviour
         }
         
         //执行跳跃
-        if(jumpTrigger && isGrounded)
+        if(jumpTrigger && isGrounded && IsJumpKeyDown())//跳跃触发器被触发且在地面且跳跃键被按下s
         {
             jumpTimeCounter = 0f;//重置跳跃时间计时器
             jumpTrigger = false;//重置跳跃触发器
@@ -106,7 +117,7 @@ public class PlayerJump : MonoBehaviour
         }
         //空中跳跃
         Debug.Log("AirjumpChance: " + airjumpChance);
-        if(airjumpChance && !isGrounded && jumpTrigger)//在空中且空中跳跃未使用且跳跃键被按下
+        if(airjumpChance && !isGrounded && jumpTrigger && canAirJump)//在空中且空中跳跃未使用且跳跃键被按下
         {
             jumpSound.Play();//播放跳跃音效
             Animator currentAnim = GetCurrentAnimator();
@@ -147,7 +158,7 @@ public class PlayerJump : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y * 0.3f, -2f));//减少下落速度
         }
 
-        if (facingWall && !isGrounded && jumpTrigger)
+        if (facingWall && !isGrounded && jumpTrigger && IsJumpKeyDown())
         {
             jumpSound.Play();//播放跳跃音效
             float wallDirection = GetComponent<WallCheck>().wallDirection; //获取墙壁方向
