@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: IMG_8724
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: 26d4cb90bc3a9ff42a32e67f9b0aa7ef, type: 3}
-  m_Color: {r: 0.37106913, g: 0.2859487, b: 0.23454367, a: 1}
+  m_Color: {r: 0.49803922, g: 0.37254903, b: 0.3019608, a: 1}
   m_Transform:
     e00: 1
     e01: 0

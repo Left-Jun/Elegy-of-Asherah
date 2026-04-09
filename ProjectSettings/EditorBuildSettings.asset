@@ -12,12 +12,12 @@ EditorBuildSettings:
     path: "Assets/Scenes/\u7EC3\u4E60.unity"
     guid: 01ad7ad41958f8c4f9f3d7fd4ab5fde1
   - enabled: 1
-    path: "Assets/Scenes/\u7EC3\u4E60 4.unity"
-    guid: ee1dd0171dec09e46aa1c3806a8bf6c0
+    path: "Assets/Scenes/\u7EC3\u4E60 1.unity"
+    guid: 1109d57f7fad62140b816e307910b6c6
   - enabled: 1
-    path: "Assets/Scenes/\u7EC3\u4E60 5.unity"
-    guid: 6e6fa4a57f401f942a7a417380a5dd7e
+    path: "Assets/Scenes/\u7EC3\u4E60 2.unity"
+    guid: 623d211df998a6f478311617d0d3f40a
   - enabled: 1
-    path: "Assets/Scenes/\u7EC3\u4E60 6.unity"
-    guid: 6a3781257734173439f73a5c82e8af70
+    path: "Assets/Scenes/\u7EC3\u4E60 3.unity"
+    guid: bacbfc67511b4994d881c395137e4abb
   m_configObjects: {}
