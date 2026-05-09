@@ -17,8 +17,9 @@ public class GetRespawn : MonoBehaviour
 
     void Update()
     {
-        respawnPosition = GetComponent<Checkpoints>().checkPoint.position;
-        Debug.Log("Respawn Position: " + respawnPosition);
+        Checkpoints checkpoints = GetComponent<Checkpoints>();
+        if (checkpoints != null && checkpoints.checkPoint != null)
+            respawnPosition = checkpoints.checkPoint.position;
     }
 
     public void Respawn()

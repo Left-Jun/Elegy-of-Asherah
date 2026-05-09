@@ -132,6 +132,22 @@ public class PlayerDash : MonoBehaviour
     public Vector2 GetDashDirection() => dashDirection;
     
     public void SetDashSpeed(float speed) => dashSpeed = speed;
+
+    public void SetDashDuration(float duration) => dashDuration = Mathf.Max(0f, duration);
+
+    public void SetDashCooldown(float cooldown)
+    {
+        dashCooldown = Mathf.Max(0f, cooldown);
+        if (!isDashing)
+            dashCooldownTimer = Mathf.Min(dashCooldownTimer, dashCooldown);
+    }
+
+    public void SetMaxAirDashes(int count, bool refillCurrentCount = false)
+    {
+        maxAirDashes = Mathf.Max(0, count);
+        if (refillCurrentCount || airDashCount > maxAirDashes)
+            airDashCount = maxAirDashes;
+    }
     
     public int GetCurrentAirDashCount() => airDashCount;
     

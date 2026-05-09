@@ -44,20 +44,33 @@ public class EnergyDrainController : MonoBehaviour
         if (isPaused) return;  // 暂停时不进行流失
 
         if (energyManager == null || maskControl == null || safetyTimer == null) return;
-        if (energyManager.currentEnergy <= 0f) return;
         if (isDead) return;
+        if (energyManager.currentEnergy <= 0f)
+        {
+            TriggerDeathEnding();
+            return;
+        }
 
         UpdateDrainRate();
         if (currentDrainRate > 0f)
         {
             float drainAmount = currentDrainRate * Time.deltaTime;
-            bool success = energyManager.ConsumeEnergy(drainAmount);
-            if (!success)
+            if (energyManager.currentEnergy <= drainAmount)
             {
-                EndingManager.Instance?.TriggerDeathEnding();
-                isDead = true;
+                energyManager.SetEnergy(0f);
+                TriggerDeathEnding();
+                return;
             }
+
+            energyManager.ConsumeEnergy(drainAmount);
         }
+    }
+
+    private void TriggerDeathEnding()
+    {
+        if (isDead) return;
+        isDead = true;
+        EndingManager.Instance?.TriggerDeathEnding();
     }
 
     private void UpdateDrainRate()

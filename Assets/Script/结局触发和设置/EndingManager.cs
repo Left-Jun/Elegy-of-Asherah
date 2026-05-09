@@ -48,12 +48,12 @@ public class EndingManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
         energyManager = EnergyManager.Instance;
+        endingTriggered = false;
         if (energyManager == null)
             Debug.LogError("EndingManager: 未找到 EnergyManager！");
     }
@@ -193,5 +193,11 @@ public class EndingManager : MonoBehaviour
         Normal,
         Low,
         Death
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }

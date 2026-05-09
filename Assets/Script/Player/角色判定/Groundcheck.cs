@@ -7,6 +7,7 @@ public class GroundCheck : MonoBehaviour
     [Header("检测设置")]
     [SerializeField] private float groundCheckDistance; // 地面检测距离
     [SerializeField] private LayerMask groundLayer; // 地面图层
+    public LayerMask GroundLayer => groundLayer;
     
     [Header("地面类型检测")]
     [SerializeField] private bool detectGroundTypes = false; // 是否检测地面类型

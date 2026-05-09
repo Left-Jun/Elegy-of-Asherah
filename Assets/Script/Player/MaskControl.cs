@@ -261,7 +261,9 @@ public class MaskControl : MonoBehaviour
         if (playerDash != null)
         {
             playerDash.SetDashSpeed(currentStats.dashSpeed);
-            playerDash.AddAirDash(currentStats.maxAirDashes - playerDash.GetCurrentAirDashCount());
+            playerDash.SetDashDuration(currentStats.dashDuration);
+            playerDash.SetDashCooldown(currentStats.dashCooldown);
+            playerDash.SetMaxAirDashes(currentStats.maxAirDashes, true);
         }
     }
 

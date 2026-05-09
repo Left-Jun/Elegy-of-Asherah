@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class Platformmove : MonoBehaviour
@@ -8,21 +7,41 @@ public class Platformmove : MonoBehaviour
     [SerializeField] private float speed;
 
     private bool isBeingDestroyed = false;
+    private Rigidbody2D rb;
+    private Vector2 lastPosition;
+    public Vector2 CurrentVelocity { get; private set; }
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         if (PiontA != null && PiontB != null)
             Pos = PiontA;
+        lastPosition = rb != null ? rb.position : (Vector2)transform.position;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        if (PiontA == null || PiontB == null) return;
-        if (Vector2.Distance(transform.position, PiontA.position) < 0.1f)
+        if (PiontA == null || PiontB == null || Pos == null)
+        {
+            CurrentVelocity = Vector2.zero;
+            return;
+        }
+
+        Vector2 currentPosition = rb != null ? rb.position : (Vector2)transform.position;
+
+        if (Vector2.Distance(currentPosition, PiontA.position) < 0.1f)
             Pos = PiontB;
-        else if (Vector2.Distance(transform.position, PiontB.position) < 0.1f)
+        else if (Vector2.Distance(currentPosition, PiontB.position) < 0.1f)
             Pos = PiontA;
-        transform.position = Vector2.MoveTowards(transform.position, Pos.position, speed * Time.deltaTime);
+
+        Vector2 nextPosition = Vector2.MoveTowards(currentPosition, Pos.position, speed * Time.fixedDeltaTime);
+        if (rb != null && rb.bodyType == RigidbodyType2D.Kinematic)
+            rb.MovePosition(nextPosition);
+        else
+            transform.position = nextPosition;
+
+        CurrentVelocity = (nextPosition - lastPosition) / Mathf.Max(Time.fixedDeltaTime, 0.0001f);
+        lastPosition = nextPosition;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -32,7 +51,9 @@ public class Platformmove : MonoBehaviour
 
         if (!isBeingDestroyed && gameObject != null && gameObject.activeInHierarchy)
         {
-            collision.transform.SetParent(transform);
+            PlayerMove playerMove = collision.GetComponent<PlayerMove>();
+            if (playerMove != null)
+                playerMove.SetCurrentPlatform(this);
         }
     }
 
@@ -47,22 +68,26 @@ public class Platformmove : MonoBehaviour
             return; // 直接返回，不进行任何操作
         }
 
-        // 正常情况：玩家离开平台，解除父子关系
-        if (collision.transform.parent == transform)
-            collision.transform.SetParent(null);
+        PlayerMove playerMove = collision.GetComponent<PlayerMove>();
+        if (playerMove != null)
+            playerMove.ClearCurrentPlatform(this);
     }
 
     private void OnDestroy()
     {
         isBeingDestroyed = true;
-        // 强制解除所有以本平台为父级的玩家（平台销毁时兜底）
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject player in players)
         {
-            if (player != null && player.transform.parent == transform)
+            if (player == null) continue;
+
+            PlayerMove playerMove = player.GetComponent<PlayerMove>();
+            if (playerMove != null)
+                playerMove.ClearCurrentPlatform(this);
+
+            if (player.transform.parent == transform)
             {
                 player.transform.SetParent(null);
-                Debug.Log("平台销毁时强制解除玩家父子关系");
             }
         }
     }

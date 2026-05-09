@@ -15,7 +15,5 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(t1.position);
-        Debug.Log(t2.position);
     }
 }

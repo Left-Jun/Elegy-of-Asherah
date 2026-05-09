@@ -5,8 +5,9 @@ using UnityEngine;
 public class WallCheck : MonoBehaviour
 {
     [Header("检测设置")]
-    [SerializeField] private float wallCheckDistance; // 墙壁检测距离
-    [SerializeField] private LayerMask wallLayer; // 墙壁图层
+    [SerializeField] private float wallCheckDistance = 0.2f; // 墙壁检测距离
+    [SerializeField] private LayerMask wallLayer; // 额外墙壁图层；为空时可直接复用地形层
+    [SerializeField] private bool includeGroundLayer = true; // 允许直接检测地形层，画地图时不用再单独铺墙
     
     [Header("墙壁类型（可选）")]
     [SerializeField] private bool detectWallTypes = false; // 是否检测墙壁类型
@@ -23,6 +24,12 @@ public class WallCheck : MonoBehaviour
     public float wallAngle; // 角度
     public Vector2 wallNormal; // 法线
     public Collider2D wallCollider; // 碰撞体
+    private GroundCheck groundCheck;
+
+    private void Awake()
+    {
+        groundCheck = GetComponentInParent<GroundCheck>();
+    }
     
     void Update()
     {
@@ -33,10 +40,9 @@ public class WallCheck : MonoBehaviour
     // 墙壁检测函数
     private void CheckWalls()
     {
-        // 检测左侧墙壁（从角色位置发射）
-        RaycastHit2D hitWallLeft = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, wallLayer);
-        // 检测右侧墙壁
-        RaycastHit2D hitWallRight = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, wallLayer);
+        LayerMask detectionMask = GetDetectionMask();
+        RaycastHit2D hitWallLeft = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, detectionMask);
+        RaycastHit2D hitWallRight = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, detectionMask);
 
         // 更新状态
         isWallLeft = hitWallLeft.collider != null;
@@ -73,6 +79,17 @@ public class WallCheck : MonoBehaviour
         {
             wallType = "None";
         }
+    }
+
+    private LayerMask GetDetectionMask()
+    {
+        int mask = wallLayer.value;
+        if (includeGroundLayer && groundCheck != null)
+        {
+            mask |= groundCheck.GroundLayer.value;
+        }
+
+        return mask == 0 ? Physics2D.GetLayerCollisionMask(gameObject.layer) : mask;
     }
     
     // 检测墙壁类型
@@ -117,12 +134,12 @@ public class WallCheck : MonoBehaviour
     {
         if (isWallLeft)
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, wallLayer);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, GetDetectionMask());
             if (hit.collider != null) return hit.normal;
         }
         else if (isWallRight)
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, wallLayer);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, GetDetectionMask());
             if (hit.collider != null) return hit.normal;
         }
         return Vector2.zero;

@@ -29,15 +29,11 @@ public class EnergyManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
-        // 初始化数值
-        currentEnergy = Mathf.Clamp(startingEnergy, 0f, maxEnergy);
-        currentShard = Mathf.Clamp(startingShard, 0, maxShard);   // 新增
-        TriggerEvents();
+        ResetValues();
     }
 
     public void AddEnergy(float amount)
@@ -86,5 +82,18 @@ public class EnergyManager : MonoBehaviour
     {
         OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
         OnShardChanged?.Invoke(currentShard, maxShard);
+    }
+
+    public void ResetValues()
+    {
+        currentEnergy = Mathf.Clamp(startingEnergy, 0f, maxEnergy);
+        currentShard = Mathf.Clamp(startingShard, 0, maxShard);
+        TriggerEvents();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }

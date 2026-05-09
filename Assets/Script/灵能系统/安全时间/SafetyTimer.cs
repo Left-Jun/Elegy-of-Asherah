@@ -31,7 +31,6 @@ public class SafetyTimer : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // 可根据需要保留或移除
     }
 
     private void Start()
@@ -145,5 +144,11 @@ public class SafetyTimer : MonoBehaviour
     public void SetPlayerTransform(Transform player)
     {
         playerTransform = player;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }

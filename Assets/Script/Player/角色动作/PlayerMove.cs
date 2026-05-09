@@ -8,6 +8,7 @@ public class PlayerMove : MonoBehaviour
     private Animator animator; //动画组件
     private PlayerJump playerJump;//跳跃组件
     private PlayerDash playerDash; // 冲刺组件
+    private Platformmove currentPlatform;
     [SerializeField]private AudioSource walkSound;//行走音效
     public float moveSpeed;//移动速度
     public float MoveController;//水平输入
@@ -26,7 +27,7 @@ public class PlayerMove : MonoBehaviour
     void Update()
     {   
         // 如果不是蹬墙跳状态
-        if(!playerJump.toWallJump)
+        if(playerJump == null || !playerJump.toWallJump)
         {
             // 如果不是冲刺状态，才执行移动
             if (playerDash == null || !playerDash.isDashing)
@@ -50,19 +51,25 @@ public class PlayerMove : MonoBehaviour
         MoveController = Input.GetAxisRaw("Horizontal");
         
         //地面检测
-        isGroundCheck = GetComponent<PlayerJump>().isGrounded;
+        isGroundCheck = playerJump != null && playerJump.isGrounded;
         
         //行走音效
         if(MoveController != 0 && isGroundCheck){
-            if(!walkSound.isPlaying)
+            if(walkSound != null && !walkSound.isPlaying)
                 walkSound.Play();
         }
         else{
-            walkSound.Pause();
+            if(walkSound != null)
+                walkSound.Pause();
         }
         
         //执行移动
-        rb.velocity = new Vector2(moveSpeed * MoveController, rb.velocity.y);
+        Vector2 targetVelocity = new Vector2(moveSpeed * MoveController, rb.velocity.y);
+        if (currentPlatform != null && isGroundCheck)
+        {
+            targetVelocity += currentPlatform.CurrentVelocity;
+        }
+        rb.velocity = targetVelocity;
     }
 
     //角色朝向函数
@@ -72,19 +79,25 @@ public class PlayerMove : MonoBehaviour
         if (playerDash != null && playerDash.isDashing)
         {
             float dashX = playerDash.GetDashDirection().x;
-            if (dashX > 0)
-                transform.localScale = new Vector2(1, 1);
-            else if (dashX < 0)
-                transform.localScale = new Vector2(-1, 1);
+            FaceByHorizontalDirection(dashX);
+        }
+        else if (playerJump != null && playerJump.toWallJump)
+        {
+            FaceByHorizontalDirection(rb.velocity.x);
         }
         else
         {
             // 普通移动时的朝向
-            if(rb.velocity.x > 0)
-                transform.localScale = new Vector2(1,1);
-            else if(rb.velocity.x < 0)
-                transform.localScale = new Vector2(-1,1);
+            FaceByHorizontalDirection(MoveController);
         }
+    }
+
+    public void FaceByHorizontalDirection(float direction)
+    {
+        if (direction > 0)
+            transform.localScale = new Vector2(1, transform.localScale.y);
+        else if (direction < 0)
+            transform.localScale = new Vector2(-1, transform.localScale.y);
     }
     
     //动画控制函数
@@ -101,6 +114,18 @@ public class PlayerMove : MonoBehaviour
             isRunning = Mathf.Abs(rb.velocity.x) > 0.1f;
         }
         
-        animator.SetBool("isRunning", isRunning);
+        if (animator != null)
+            animator.SetBool("isRunning", isRunning);
+    }
+
+    public void SetCurrentPlatform(Platformmove platform)
+    {
+        currentPlatform = platform;
+    }
+
+    public void ClearCurrentPlatform(Platformmove platform)
+    {
+        if (currentPlatform == platform)
+            currentPlatform = null;
     }
 }

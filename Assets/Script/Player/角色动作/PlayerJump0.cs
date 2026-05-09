@@ -42,6 +42,8 @@ public void SetCanAirJump(bool can)
 }
     //============================================================
     private WallCheck wallcheck;//贴墙状态
+    private GroundCheck groundcheck;
+    private PlayerMove playerMove;
     private Coroutine wallJumpCoroutine;//蹬墙跳协程引用
     //============================================================
     [Header("状态（通用）")]
@@ -61,13 +63,13 @@ public void SetCanAirJump(bool can)
         rb = GetComponent<Rigidbody2D>();
         //animator = GetComponent<Animator>();
         wallcheck = GetComponentInChildren<WallCheck>();
+        groundcheck = GetComponent<GroundCheck>();
+        playerMove = GetComponent<PlayerMove>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log($"触发: {jumpTrigger}, 长按: {jumpHeld}, 松开: {jumpReleased}, 冷却: {inputOnCooldown}");
-        
         //跳跃输入检测
         HandleJumpInput();
         //扶墙输入检测
@@ -105,7 +107,7 @@ public void SetCanAirJump(bool can)
             jumpTimeCounter = 0f;//重置跳跃时间计时器
             jumpTrigger = false;//重置跳跃触发器
             rb.velocity = new Vector2(rb.velocity.x,jumpForce);//施加跳跃力
-            jumpSound.Play();//播放跳跃音效
+            PlayJumpSound();//播放跳跃音效
             airjumpChance = true;//重置空中跳跃机会为真
             walljumpHeld = false;//重置蹬墙跳长按状态
         }
@@ -116,10 +118,9 @@ public void SetCanAirJump(bool can)
             jumpTimeCounter += Time.deltaTime;//增加跳跃时间计时器
         }
         //空中跳跃
-        Debug.Log("AirjumpChance: " + airjumpChance);
         if(airjumpChance && !isGrounded && jumpTrigger && canAirJump)//在空中且空中跳跃未使用且跳跃键被按下
         {
-            jumpSound.Play();//播放跳跃音效
+            PlayJumpSound();//播放跳跃音效
             Animator currentAnim = GetCurrentAnimator();
             if (currentAnim != null) currentAnim.SetTrigger("isAirjump");//触发空中跳跃动画
             rb.velocity = new Vector2(rb.velocity.x,airjumpForce);//施加跳跃力
@@ -138,30 +139,37 @@ public void SetCanAirJump(bool can)
     //蹬墙跳函数
     private void WallJumping()
     {
-        // 获取角色朝向和墙壁方向
-        int facingDir = (int)Mathf.Sign(transform.localScale.x);
-        int wallDir = wallcheck.wallDirection;
-        // 是否面向墙壁（有墙且朝向与墙壁方向相同）
-        facingWall = wallcheck.isWall && (facingDir == wallDir);
+        if (wallcheck == null)
+        {
+            facingWall = false;
+            return;
+        }
+
+        // 是否主动朝墙按住方向键；不再依赖速度或朝向，避免竖直墙面上速度归零后无法攀附
+        facingWall = wallcheck.isWall && IsPressingTowardWall();
         
         if (facingWall)
         {
             airjumpChance = true;//重置空中跳跃机会为真
         }
 
+        float wallPlatformVelocityY = GetWallPlatformVelocity().y;
+
         if (facingWall && !isGrounded && !walljumpHeld)
         {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.95f);//减少下落速度
+            float relativeVerticalVelocity = rb.velocity.y - wallPlatformVelocityY;
+            rb.velocity = new Vector2(rb.velocity.x, relativeVerticalVelocity * 0.95f + wallPlatformVelocityY);//减少下落速度
         }
         if (facingWall && walljumpHeld && !isGrounded && !toWallJump)
         {
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y * 0.3f, -2f));//减少下落速度
+            float relativeVerticalVelocity = rb.velocity.y - wallPlatformVelocityY;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(relativeVerticalVelocity * 0.3f, -2f) + wallPlatformVelocityY);//减少下落速度
         }
 
-        if (facingWall && !isGrounded && jumpTrigger && IsJumpKeyDown())
+        if (wallcheck.isWall && !isGrounded && jumpTrigger && IsJumpKeyDown())
         {
-            jumpSound.Play();//播放跳跃音效
-            float wallDirection = GetComponent<WallCheck>().wallDirection; //获取墙壁方向
+            PlayJumpSound();//播放跳跃音效
+            float wallDirection = wallcheck.wallDirection; //获取墙壁方向
             Animator currentAnim = GetCurrentAnimator();
             if (currentAnim != null) currentAnim.SetTrigger("isWalljump");
             if (wallJumpCoroutine != null)
@@ -174,19 +182,29 @@ public void SetCanAirJump(bool can)
             newVelocity.y = 0;
             rb.velocity = newVelocity;
             rb.velocity = new Vector2(-wallDirection * wallJumpForceX, wallJumpForceY);
+            if (playerMove != null)
+                playerMove.FaceByHorizontalDirection(rb.velocity.x);
             airjumpChance = true;
             jumpTrigger = false;
             jumpTimeCounter = 0f;
         }
     }
+
+    private Vector2 GetWallPlatformVelocity()
+    {
+        if (wallcheck == null || wallcheck.wallCollider == null)
+            return Vector2.zero;
+
+        Platformmove wallPlatform = wallcheck.wallCollider.GetComponentInParent<Platformmove>();
+        return wallPlatform != null ? wallPlatform.CurrentVelocity : Vector2.zero;
+    }
+
     //蹬墙跳协程
     IEnumerator ToWallJump()
     {
         toWallJump = true;
-        Debug.Log("ToWallJump: 开始设置为true");
         yield return new WaitForSeconds(0.2f);
         toWallJump = false;
-        Debug.Log("ToWallJump: 结束设置为false");
         wallJumpCoroutine = null;
     }
 //============================================================================================================================
@@ -254,6 +272,13 @@ public void SetCanAirJump(bool can)
     //扶墙输入检测函数
     private void HandleWallJumpInput()
     {
+        if (wallcheck == null)
+        {
+            walljumpHeld = false;
+            walljumpReleased = true;
+            return;
+        }
+
         //检测扶墙按键按下
         if(IsWallKeyDown())
         {
@@ -264,7 +289,6 @@ public void SetCanAirJump(bool can)
         {
             walljumpHeld = true;
             walljumpReleased = false;
-            Debug.Log("扶墙键长按");
         }
         //检测扶墙按键松开
         if(IsWallKeyUp())
@@ -276,29 +300,36 @@ public void SetCanAirJump(bool can)
     //辅助方法：检查扶墙按键按下
     private bool IsWallKeyDown()
     {
-        float wallDirection = transform.localScale.x;
-        return (Input.GetKeyDown(KeyCode.A) ||Input.GetKeyDown(KeyCode.LeftArrow))&&wallDirection < 0 || 
-               (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && wallDirection > 0;
+        int wallDirection = wallcheck != null ? wallcheck.wallDirection : 0;
+        return ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && wallDirection < 0) ||
+               ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && wallDirection > 0);
     }
     //辅助方法：检查扶墙按键持续按下
     private bool IsWallKey()
     {
-        float wallDirection = transform.localScale.x;
-        return (Input.GetKey(KeyCode.A) ||Input.GetKey(KeyCode.LeftArrow))&&wallDirection < 0 || 
-               (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && wallDirection > 0;
+        return IsPressingTowardWall();
     }
     //辅助方法：检查扶墙按键松开
     private bool IsWallKeyUp()
     {
-        float wallDirection = transform.localScale.x;
-        return (Input.GetKeyUp(KeyCode.A) ||Input.GetKeyUp(KeyCode.LeftArrow))&&wallDirection < 0 || 
-               (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow)) && wallDirection > 0;
+        int wallDirection = wallcheck != null ? wallcheck.wallDirection : 0;
+        return ((Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow)) && wallDirection < 0) ||
+               ((Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow)) && wallDirection > 0);
+    }
+
+    private bool IsPressingTowardWall()
+    {
+        if (wallcheck == null || wallcheck.wallDirection == 0)
+            return false;
+
+        return ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && wallcheck.wallDirection < 0) ||
+               ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && wallcheck.wallDirection > 0);
     }
 //============================================================================================================================
     //地面检测函数
     private void GroundeCheck()
     {
-        isGrounded = GetComponent<GroundCheck>().isGrounded;
+        isGrounded = groundcheck != null && groundcheck.isGrounded;
     }
     
     //跳跃状态更新函数
@@ -334,6 +365,12 @@ public void SetCanAirJump(bool can)
             return maskControl.GetCurrentActiveAnimator();
         }
         return null;
+    }
+
+    private void PlayJumpSound()
+    {
+        if (jumpSound != null)
+            jumpSound.Play();
     }
 }
 /*        //斜向上走路
