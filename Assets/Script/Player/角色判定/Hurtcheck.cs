@@ -5,6 +5,7 @@ using UnityEngine;
 public class Hurtcheck : MonoBehaviour
 {
     private GetRespawn getRespawn;
+    private PlayerDash playerDash;
     [Header("伤害检测状态")]
     public bool ishurt;
     [SerializeField]private bool istraphurt;
@@ -20,13 +21,12 @@ public class Hurtcheck : MonoBehaviour
     void Start()
     {
         getRespawn = GetComponentInParent<GetRespawn>();
+        playerDash = GetComponentInParent<PlayerDash>();
         if (getRespawn == null)
         {
             Debug.LogWarning("HurtCheck: 未在父物体上找到 GetRespawn 脚本。");
         }
     }
-
-    void Update() { }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -58,10 +58,17 @@ public class Hurtcheck : MonoBehaviour
         }
 
         // 灵能碎片收集（原来的“情绪碎片”改为灵能碎片）
+        TryBreakDashTarget(collision);
+
         if (collision.gameObject.CompareTag("EmotionShard"))
         {
             CollectShard(collision.gameObject);
         }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        TryBreakDashTarget(collision);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -110,6 +117,12 @@ public class Hurtcheck : MonoBehaviour
         istraphurt = false;
         isdead = false;
         Debug.Log("角色已重生，状态重置。");
+    }
+
+    private void TryBreakDashTarget(Collider2D collision)
+    {
+        if (playerDash != null)
+            playerDash.TryBreakDashTarget(collision);
     }
 }
 
