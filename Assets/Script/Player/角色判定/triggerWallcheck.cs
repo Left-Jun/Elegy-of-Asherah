@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WallCheck : MonoBehaviour
 {
     [Header("检测设置")]
     [SerializeField] private float wallCheckDistance = 0.2f; // 墙壁检测距离
-    [SerializeField] private LayerMask wallLayer; // 额外墙壁图层；为空时可直接复用地形层
-    [SerializeField] private bool includeGroundLayer = true; // 允许直接检测地形层，画地图时不用再单独铺墙
+    [FormerlySerializedAs("wallLayer")]
+    [SerializeField] private LayerMask extraWallLayer; // 额外墙壁图层；通常留空，直接复用 Terrian 地形层
+    [FormerlySerializedAs("includeGroundLayer")]
+    [SerializeField] private bool includeTerrainLayer = true; // 允许直接检测地形层，画地图时不用再单独铺墙
     
     [Header("墙壁类型（可选）")]
     [SerializeField] private bool detectWallTypes = false; // 是否检测墙壁类型
@@ -25,10 +28,12 @@ public class WallCheck : MonoBehaviour
     public Vector2 wallNormal; // 法线
     public Collider2D wallCollider; // 碰撞体
     private GroundCheck groundCheck;
+    private int namedTerrainLayerMask;
 
     private void Awake()
     {
         groundCheck = GetComponentInParent<GroundCheck>();
+        namedTerrainLayerMask = GetLayerMaskByName("Terrian") | GetLayerMaskByName("Terrain");
     }
     
     void Update()
@@ -83,13 +88,24 @@ public class WallCheck : MonoBehaviour
 
     private LayerMask GetDetectionMask()
     {
-        int mask = wallLayer.value;
-        if (includeGroundLayer && groundCheck != null)
+        int mask = extraWallLayer.value;
+        if (includeTerrainLayer)
         {
-            mask |= groundCheck.GroundLayer.value;
+            mask |= groundCheck != null ? groundCheck.TerrainLayer.value : GetNamedTerrainLayerMask();
         }
 
         return mask == 0 ? Physics2D.GetLayerCollisionMask(gameObject.layer) : mask;
+    }
+
+    private int GetNamedTerrainLayerMask()
+    {
+        return namedTerrainLayerMask;
+    }
+
+    private int GetLayerMaskByName(string layerName)
+    {
+        int layer = LayerMask.NameToLayer(layerName);
+        return layer >= 0 ? 1 << layer : 0;
     }
     
     // 检测墙壁类型

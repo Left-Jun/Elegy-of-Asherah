@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GroundCheck : MonoBehaviour
 {
     [Header("检测设置")]
     [SerializeField] private float groundCheckDistance; // 地面检测距离
-    [SerializeField] private LayerMask groundLayer; // 地面图层
-    public LayerMask GroundLayer => groundLayer;
+    [FormerlySerializedAs("groundLayer")]
+    [SerializeField] private LayerMask terrainLayer; // 地形图层，项目里当前命名为 Terrian
+    public LayerMask TerrainLayer => GetTerrainDetectionMask();
+    public LayerMask GroundLayer => TerrainLayer; // 兼容旧脚本命名
+    private int namedTerrainLayerMask;
     
     [Header("地面类型检测")]
     [SerializeField] private bool detectGroundTypes = false; // 是否检测地面类型
@@ -23,6 +27,11 @@ public class GroundCheck : MonoBehaviour
     public float groundAngle; // 地面角度
     public Vector2 groundNormal; // 地面法线
     public Collider2D groundCollider; // 地面碰撞体
+
+    private void Awake()
+    {
+        namedTerrainLayerMask = GetLayerMaskByName("Terrian") | GetLayerMaskByName("Terrain");
+    }
     
     void Update()
     {
@@ -33,7 +42,7 @@ public class GroundCheck : MonoBehaviour
     private void CheckGround()
     {
         // 检测下方地面（从角色位置发射）
-        RaycastHit2D hitGround = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D hitGround = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, GetTerrainDetectionMask());
         
         // 更新状态
         isGrounded = hitGround.collider != null;
@@ -121,6 +130,18 @@ public class GroundCheck : MonoBehaviour
         {
             groundType = tag; // 返回实际标签
         }
+    }
+
+    private LayerMask GetTerrainDetectionMask()
+    {
+        int mask = terrainLayer.value | namedTerrainLayerMask;
+        return mask == 0 ? Physics2D.GetLayerCollisionMask(gameObject.layer) : mask;
+    }
+
+    private int GetLayerMaskByName(string layerName)
+    {
+        int layer = LayerMask.NameToLayer(layerName);
+        return layer >= 0 ? 1 << layer : 0;
     }
     
     // 获取地面摩擦力（根据地面类型）

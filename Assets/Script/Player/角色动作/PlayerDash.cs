@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 
 public class PlayerDash : MonoBehaviour
 {
@@ -41,6 +42,10 @@ public class PlayerDash : MonoBehaviour
     [SerializeField] private bool enhancedDashBreaksObjects = true;
     [SerializeField] private string breakableWallTag = "BreakableWall";
     [SerializeField] private float breakAnimationDestroyDelay = 0.5f;
+    [SerializeField] private int fallbackTileSearchRadius = 1;
+    [SerializeField] private int fallbackTileBreakRadius = 0;
+    [SerializeField] private float closeBreakProbeDistance = 0.5f;
+    [SerializeField] private float closeBreakProbeRadius = 0.15f;
     
     // 用于检测 facingWall 状态变化
     private bool lastFacingWall = false;
@@ -101,18 +106,45 @@ public class PlayerDash : MonoBehaviour
     
     private void DetermineDashDirection()
     {
-        if (playerJump != null && playerJump.facingWall && wallcheck != null)
+        if (TryGetWallDashDirection(out Vector2 wallDashDirection))
         {
-            float wallDir = wallcheck.wallDirection;
-            dashDirection = new Vector2(-wallDir, 0f);
+            dashDirection = wallDashDirection;
         }
         else
         {
-            float facing = Mathf.Sign(transform.localScale.x);
-            dashDirection = new Vector2(facing, 0f);
+            float horizontalInput = Input.GetAxisRaw("Horizontal");
+            float dashX = Mathf.Abs(horizontalInput) > 0.01f ? horizontalInput : transform.localScale.x;
+            dashDirection = new Vector2(Mathf.Sign(dashX), 0f);
         }
+
         if (freezeYVelocity) dashDirection.y = 0f;
         dashDirection.Normalize();
+    }
+
+    private bool TryGetWallDashDirection(out Vector2 wallDashDirection)
+    {
+        wallDashDirection = Vector2.zero;
+        if (playerJump == null || playerJump.isGrounded || wallcheck == null || !wallcheck.isWall || wallcheck.wallDirection == 0)
+            return false;
+
+        int wallDirection = wallcheck.wallDirection;
+        if (ShouldDashIntoBreakableWall(wallcheck.wallCollider))
+            wallDashDirection = new Vector2(wallDirection, 0f);
+        else
+            wallDashDirection = new Vector2(-wallDirection, 0f);
+
+        return true;
+    }
+
+    private bool ShouldDashIntoBreakableWall(Collider2D wallCollider)
+    {
+        if (!enhancedDashBreaksObjects || wallCollider == null)
+            return false;
+
+        if (maskControl == null || maskControl.currentState != MaskControl.State.Enhanced)
+            return false;
+
+        return IsBreakableTarget(wallCollider);
     }
     
     private IEnumerator DashCoroutine()
@@ -131,6 +163,7 @@ public class PlayerDash : MonoBehaviour
         
         float originalGravity = rb.gravityScale;
         if (freezeYVelocity) rb.gravityScale = 0f;
+        TryBreakCloseDashTargets();
         
         float elapsed = 0f;
         while (elapsed < dashDuration)
@@ -141,6 +174,7 @@ public class PlayerDash : MonoBehaviour
             Vector2 velocity = dashDirection * currentSpeed;
             if (freezeYVelocity) velocity.y = 0f;
             rb.velocity = velocity;
+            TryBreakCloseDashTargets();
             elapsed += Time.deltaTime;
             yield return null;
         }
@@ -167,6 +201,14 @@ public class PlayerDash : MonoBehaviour
         TryBreakDashTarget(collision.collider);
     }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision == null || collision.collider == null)
+            return;
+
+        TryBreakDashTarget(collision.collider);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         TryBreakDashTarget(collision);
@@ -182,17 +224,12 @@ public class PlayerDash : MonoBehaviour
         if (!CanBreakDuringDash(targetCollider))
             return false;
 
-        BreakableTilemap breakableTilemap = GetBreakableTilemap(targetCollider);
-        if (breakableTilemap != null)
+        if (TryBreakTilemapTarget(targetCollider, out bool brokeTilemap))
         {
-            Vector2 breakPoint = targetCollider.ClosestPoint(transform.position);
-            if (breakableTilemap.TryBreakAtWorldPosition(breakPoint))
-            {
+            if (brokeTilemap)
                 KeepDashVelocity();
-                return true;
-            }
 
-            return false;
+            return brokeTilemap;
         }
 
         GameObject breakableRoot = GetBreakableRoot(targetCollider);
@@ -216,6 +253,44 @@ public class PlayerDash : MonoBehaviour
         return true;
     }
 
+    private void TryBreakCloseDashTargets()
+    {
+        if (!isDashing || !enhancedDashBreaksObjects)
+            return;
+
+        if (wallcheck != null && wallcheck.wallCollider != null)
+        {
+            TryBreakDashTarget(wallcheck.wallCollider);
+        }
+
+        if (dashDirection.sqrMagnitude <= 0.001f)
+            return;
+
+        float probeDistance = Mathf.Max(0f, closeBreakProbeDistance);
+        if (probeDistance <= 0f)
+            return;
+
+        float probeRadius = Mathf.Max(0f, closeBreakProbeRadius);
+        Vector2 origin = transform.position;
+        Vector2 direction = dashDirection.normalized;
+
+        if (probeRadius > 0f)
+        {
+            RaycastHit2D[] hits = Physics2D.CircleCastAll(origin, probeRadius, direction, probeDistance);
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider != null)
+                    TryBreakDashTarget(hit.collider);
+            }
+        }
+        else
+        {
+            RaycastHit2D hit = Physics2D.Raycast(origin, direction, probeDistance);
+            if (hit.collider != null)
+                TryBreakDashTarget(hit.collider);
+        }
+    }
+
     private bool CanBreakDuringDash(Collider2D targetCollider)
     {
         if (!enhancedDashBreaksObjects || targetCollider == null || !isDashing)
@@ -233,6 +308,9 @@ public class PlayerDash : MonoBehaviour
             return false;
 
         if (GetBreakableTilemap(targetCollider) != null)
+            return true;
+
+        if (GetTilemap(targetCollider) != null && HasBreakableTag(targetCollider.transform))
             return true;
 
         return HasBreakableTag(targetCollider.transform);
@@ -265,6 +343,31 @@ public class PlayerDash : MonoBehaviour
         return targetCollider.gameObject;
     }
 
+    private bool TryBreakTilemapTarget(Collider2D targetCollider, out bool brokeTilemap)
+    {
+        brokeTilemap = false;
+        Vector2 breakPoint = targetCollider.ClosestPoint(transform.position);
+
+        BreakableTilemap breakableTilemap = GetBreakableTilemap(targetCollider);
+        if (breakableTilemap != null)
+        {
+            brokeTilemap = breakableTilemap.TryBreakAtWorldPosition(breakPoint);
+            return true;
+        }
+
+        Tilemap tilemap = GetTilemap(targetCollider);
+        if (tilemap == null || !HasBreakableTag(targetCollider.transform))
+            return false;
+
+        brokeTilemap = BreakableTilemap.TryBreakTilemapAtWorldPosition(
+            tilemap,
+            breakPoint,
+            fallbackTileSearchRadius,
+            fallbackTileBreakRadius);
+
+        return true;
+    }
+
     private BreakableTilemap GetBreakableTilemap(Collider2D targetCollider)
     {
         BreakableTilemap breakableTilemap = targetCollider.GetComponent<BreakableTilemap>();
@@ -272,6 +375,15 @@ public class PlayerDash : MonoBehaviour
             breakableTilemap = targetCollider.GetComponentInParent<BreakableTilemap>();
 
         return breakableTilemap;
+    }
+
+    private Tilemap GetTilemap(Collider2D targetCollider)
+    {
+        Tilemap tilemap = targetCollider.GetComponent<Tilemap>();
+        if (tilemap == null)
+            tilemap = targetCollider.GetComponentInParent<Tilemap>();
+
+        return tilemap;
     }
 
     private void DisableBreakableColliders(GameObject breakableRoot)

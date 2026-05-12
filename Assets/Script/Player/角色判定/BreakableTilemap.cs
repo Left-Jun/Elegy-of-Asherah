@@ -27,17 +27,28 @@ public class BreakableTilemap : MonoBehaviour
             return false;
         }
 
-        Vector3Int centerCell = tilemap.WorldToCell(worldPosition);
-        if (!TryFindBreakableCell(centerCell, out Vector3Int targetCell))
+        return TryBreakTilemapAtWorldPosition(tilemap, worldPosition, searchRadius, breakRadius);
+    }
+
+    public static bool TryBreakTilemapAtWorldPosition(Tilemap targetTilemap, Vector3 worldPosition, int searchRadius, int breakRadius)
+    {
+        if (targetTilemap == null)
             return false;
 
-        BreakCellsAround(targetCell);
+        int safeSearchRadius = Mathf.Max(0, searchRadius);
+        int safeBreakRadius = Mathf.Max(0, breakRadius);
+        Vector3Int centerCell = targetTilemap.WorldToCell(worldPosition);
+
+        if (!TryFindBreakableCell(targetTilemap, centerCell, safeSearchRadius, out Vector3Int targetCell))
+            return false;
+
+        BreakCellsAround(targetTilemap, targetCell, safeBreakRadius);
         return true;
     }
 
-    private bool TryFindBreakableCell(Vector3Int centerCell, out Vector3Int targetCell)
+    private static bool TryFindBreakableCell(Tilemap targetTilemap, Vector3Int centerCell, int searchRadius, out Vector3Int targetCell)
     {
-        if (tilemap.HasTile(centerCell))
+        if (targetTilemap.HasTile(centerCell))
         {
             targetCell = centerCell;
             return true;
@@ -52,7 +63,7 @@ public class BreakableTilemap : MonoBehaviour
             for (int y = -searchRadius; y <= searchRadius; y++)
             {
                 Vector3Int cell = new Vector3Int(centerCell.x + x, centerCell.y + y, centerCell.z);
-                if (!tilemap.HasTile(cell))
+                if (!targetTilemap.HasTile(cell))
                     continue;
 
                 float distance = (cell - centerCell).sqrMagnitude;
@@ -68,18 +79,18 @@ public class BreakableTilemap : MonoBehaviour
         return foundTile;
     }
 
-    private void BreakCellsAround(Vector3Int centerCell)
+    private static void BreakCellsAround(Tilemap targetTilemap, Vector3Int centerCell, int breakRadius)
     {
         for (int x = -breakRadius; x <= breakRadius; x++)
         {
             for (int y = -breakRadius; y <= breakRadius; y++)
             {
                 Vector3Int cell = new Vector3Int(centerCell.x + x, centerCell.y + y, centerCell.z);
-                if (!tilemap.HasTile(cell))
+                if (!targetTilemap.HasTile(cell))
                     continue;
 
-                tilemap.SetTile(cell, null);
-                tilemap.RefreshTile(cell);
+                targetTilemap.SetTile(cell, null);
+                targetTilemap.RefreshTile(cell);
             }
         }
     }
