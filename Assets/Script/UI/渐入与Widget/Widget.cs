@@ -14,15 +14,21 @@ public class Widget : MonoBehaviour
 
 public float RenderOpacity
 {
-    get => _canvasGroup != null ? _canvasGroup.alpha : 0f;
-    set { if (_canvasGroup != null) _canvasGroup.alpha = value; }
+    get
+    {
+        EnsureCanvasGroup();
+        return _canvasGroup != null ? _canvasGroup.alpha : 0f;
+    }
+    set
+    {
+        EnsureCanvasGroup();
+        if (_canvasGroup != null) _canvasGroup.alpha = value;
+    }
 }
 
     private void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        if (_canvasGroup == null)
-            Debug.LogError("Widget requires a CanvasGroup component.");
+        EnsureCanvasGroup();
     }
 
     private Coroutine _fadeCoroutine;
@@ -35,6 +41,16 @@ public float RenderOpacity
     /// <param name="onFinished">完成回调</param>
     public void Fade(float opacity, float duration, Action onFinished)
     {
+        EnsureCanvasGroup();
+        if (_canvasGroup == null)
+            return;
+
+        if (_fadeCoroutine != null)
+        {
+            StopCoroutine(_fadeCoroutine);
+            _fadeCoroutine = null;
+        }
+
         if (!gameObject.activeInHierarchy)
         {
             // 如果物体未激活，直接设置透明度并回调
@@ -49,10 +65,6 @@ public float RenderOpacity
         }
         else
         {
-            if (_fadeCoroutine != null)
-            {
-                StopCoroutine(_fadeCoroutine);
-            }
             _fadeCoroutine = StartCoroutine(Fading(opacity, duration, onFinished));
         }
     }
@@ -68,5 +80,14 @@ public float RenderOpacity
             yield return null;
         }
         onFinished?.Invoke();
+    }
+
+    private void EnsureCanvasGroup()
+    {
+        if (_canvasGroup == null)
+            _canvasGroup = GetComponent<CanvasGroup>();
+
+        if (_canvasGroup == null)
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
 }
